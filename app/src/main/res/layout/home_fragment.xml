@@ -6,107 +6,180 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Home Page"
-        android:textSize="20sp"
-        android:layout_margin="16dp"/>
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_margin="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Current temperature"
-            android:textSize="20sp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="20.0&#176;C"
-            android:textSize="60sp"
-            android:textAlignment="center"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="16dp"
-        android:layout_gravity="center">
+            android:text="Friday"
+            android:layout_alignParentLeft="true"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Target temperature"
-            android:textSize="20sp"/>
+            android:text="12:30"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Temperature Overview"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_margin="16dp"
+        android:textAlignment="center"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp">
+            android:orientation="horizontal">
 
-            <ImageButton
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:selectableItemBackground"
-                app:srcCompat="@drawable/ic_remove"
-                android:layout_gravity="left|center"
                 android:layout_weight="1"
-                android:id="@+id/minus_button"/>
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="20.0&#176;C"
-                android:textSize="60sp"
-                android:layout_gravity="center"
-                android:id="@+id/temperature_text"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Current"
+                    android:textAlignment="center"
+                    android:textSize="20sp" />
 
-            <ImageButton
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="20.0&#176;C"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="40sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_flame"
+                        android:layout_centerHorizontal="true"
+                        android:id="@+id/flame_image"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:srcCompat="@drawable/ic_snowflake"
+                        android:layout_centerHorizontal="true"
+                        android:id="@+id/snowflake_image"/>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?android:selectableItemBackground"
-                app:srcCompat="@drawable/ic_add"
-                android:layout_gravity="right|center"
                 android:layout_weight="1"
-                android:id="@+id/plus_button"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Target"
+                    android:textAlignment="center"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/temperature_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="20.0&#176;C"
+                    android:textAlignment="center"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textSize="40sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/minus_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:background="?android:selectableItemBackground"
+                        app:srcCompat="@drawable/ic_remove" />
+
+                    <SeekBar
+                        style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:max="30"
+                        android:layout_toLeftOf="@+id/plus_button"
+                        android:layout_toRightOf="@+id/minus_button"
+                        android:layout_marginTop="10dp"
+                        android:id="@+id/temperature_seek_bar"/>
+
+                    <ImageButton
+                        android:id="@+id/plus_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:background="?android:selectableItemBackground"
+                        app:srcCompat="@drawable/ic_add" />
+
+                </RelativeLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="center|bottom"
-        android:layout_margin="16dp">
-
-        <ToggleButton
-            style="@android:style/Widget.Button.Toggle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textOn="Auto"
-            android:textOff="Auto"
-            android:textSize="20sp"/>
+            android:orientation="vertical"
+            android:layout_margin="16dp">
 
-        <ToggleButton
-            style="@android:style/Widget.Button.Toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textOff="Manual"
-            android:textOn="Manual"
-            android:textSize="20sp"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vacation Mode"
+                    android:textSize="25sp"/>
+
+                <Switch
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/week_switch"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Week program is enabled"
+                android:textSize="20sp"
+                android:id="@+id/week_program_text"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
