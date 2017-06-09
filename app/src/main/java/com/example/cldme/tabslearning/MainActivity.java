@@ -1,8 +1,11 @@
 package com.example.cldme.tabslearning;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,10 +14,14 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextView mTextMessage;
-    private LinearLayout homeLayout;
-    private LinearLayout dashboardLayout;
-    private LinearLayout notificationsLayout;
+    //Declare the customFragment variable to store the current fragment view
+    private Fragment customFragment;
+
+    //Declare the fragmentManager
+    private FragmentManager fragmentManager;
+
+    //Declare the fragmentTransaction
+    private FragmentTransaction fragmentTransaction;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -23,19 +30,17 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    displayHomeLayout();
-                    return true;
+                    customFragment = HomeFragment.newInstance();
+                    break;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    displayDashboardLayout();
-                    return true;
+                    customFragment = DashboardFragment.newInstance();
+                    break;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    displayNotificationsLayout();
-                    return true;
+                    customFragment = NotificationsFragment.newInstance();
+                    break;
             }
-            return false;
+            displayLayout(customFragment);
+            return true;
         }
 
     };
@@ -45,39 +50,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        homeLayout = (LinearLayout) findViewById(R.id.home_layout);
-        dashboardLayout = (LinearLayout) findViewById(R.id.dashboard_layout);
-        notificationsLayout = (LinearLayout) findViewById(R.id.notifications_layout);
+        //Display the home page when the application is created (only done one time)
+        displayLayout(HomeFragment.newInstance());
 
-        displayHomeLayout();
+        //For selecting a menu item via a script use the following (2 - index of selected item)
+        //bottomNavigationView.getMenu().getItem(2).setChecked(true);
     }
 
-    private void displayHomeLayout() {
+    private void displayLayout(Fragment displayFragment) {
+        //Get a new fragmentManager
+        fragmentManager = getFragmentManager();
 
-        dashboardLayout.setVisibility(View.GONE);
-        notificationsLayout.setVisibility(View.GONE);
+        //Initialize a new transaction to be made
+        fragmentTransaction = fragmentManager.beginTransaction();
 
-        homeLayout.setVisibility(View.VISIBLE);
-    }
+        //Update the view with the fragment that needs to display
+        fragmentTransaction.replace(R.id.content, displayFragment);
 
-    private void displayDashboardLayout() {
-
-        notificationsLayout.setVisibility(View.GONE);
-        homeLayout.setVisibility(View.GONE);
-
-        dashboardLayout.setVisibility(View.VISIBLE);
-    }
-
-    private void displayNotificationsLayout() {
-
-        dashboardLayout.setVisibility(View.GONE);
-        homeLayout.setVisibility(View.GONE);
-
-        notificationsLayout.setVisibility(View.VISIBLE);
+        //Commit the changes to the view
+        fragmentTransaction.commit();
     }
 
 }
