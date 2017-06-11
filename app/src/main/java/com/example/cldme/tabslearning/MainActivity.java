@@ -12,6 +12,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.thermostatapp.util.*;
+
 public class MainActivity extends AppCompatActivity {
 
     //Declare the customFragment variable to store the current fragment view
@@ -32,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.navigation_home:
                     customFragment = HomeFragment.newInstance();
                     break;
-                case R.id.navigation_dashboard:
-                    customFragment = DashboardFragment.newInstance();
+                case R.id.navigation_program:
+                    customFragment = ProgramFragment.newInstance();
                     break;
                 case R.id.navigation_notifications:
                     customFragment = NotificationsFragment.newInstance();
@@ -58,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
 
         //For selecting a menu item via a script use the following (2 - index of selected item)
         //bottomNavigationView.getMenu().getItem(2).setChecked(true);
+
+        //Configuring variables for communicating with the server
+        HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/58";
+        HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
     }
 
     private void displayLayout(Fragment displayFragment) {

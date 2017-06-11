@@ -33,7 +33,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     //step is the increments in which the we will update the temperature
     private static double tempStep = 0.1;
 
-    //Declare variables for the different items on the homeFragment page
+    //Declare variables for the different view items on the homeFragment page
     private static ImageButton plusButton;
     private static ImageButton minusButton;
     private static TextView tempText;
