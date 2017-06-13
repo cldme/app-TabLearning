@@ -6,15 +6,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_margin="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="Placeholder text"
+            android:text="night"
             android:textSize="20sp"
-            android:id="@+id/cutom_text_view"/>
+            android:id="@+id/custom_text_view"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textSize="20sp"
+            android:layout_marginLeft="15dp"
+            android:id="@+id/time_text"/>
 
     </LinearLayout>
 

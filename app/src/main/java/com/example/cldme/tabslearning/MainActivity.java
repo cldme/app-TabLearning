@@ -2,6 +2,7 @@ package com.example.cldme.tabslearning;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -24,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
 
     //Declare the fragmentTransaction
     private FragmentTransaction fragmentTransaction;
+
+    //Get the context of the application
+    final Context appContext = this;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
     }
 
-    private void displayLayout(Fragment displayFragment) {
+    public void displayLayout(Fragment displayFragment) {
         //Get a new fragmentManager
         fragmentManager = getFragmentManager();
 

@@ -2,8 +2,11 @@ package com.example.cldme.tabslearning;
 
 import android.app.Fragment;
 import android.media.Image;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -37,7 +41,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private static ImageButton plusButton;
     private static ImageButton minusButton;
     private static TextView tempText;
-    private static TextView weekProgramText;
 
     //Declare variables for the flameImage and snowflakeImage
     private static ImageView flameImage;
@@ -63,7 +66,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         plusButton = (ImageButton) view.findViewById(R.id.plus_button);
         minusButton = (ImageButton) view.findViewById(R.id.minus_button);
         tempText = (TextView) view.findViewById(R.id.temperature_text);
-        weekProgramText = (TextView) view.findViewById(R.id.week_program_text);
 
         //Get the week switch element from the fragment
         weekSwitch = (Switch) view.findViewById(R.id.week_switch);
@@ -111,7 +113,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             case R.id.plus_button:
                 //Check if temp is above 0 and below 30, only then we update the temperature
                 if(temp >= 0 && temp < 30) {
-                    temp = Math.round((temp + 0.1) * 10.0) / 10.0;
+                    temp = temp + 0.11;
                     //Update the seekBar progress with the new temp
                     updateSeekBar(temp);
                 }
@@ -122,7 +124,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             case R.id.minus_button:
                 //Check if temp is above 0 and below 30, only then we update the temperature
                 if(temp > 0 && temp <= 30) {
-                    temp = Math.round((temp - 0.1) * 10.0) / 10.0;
+                    temp = temp - 0.09;
                     //Update the seekBar progress with the new temp
                     updateSeekBar(temp);
                 }
@@ -135,14 +137,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     public CompoundButton.OnCheckedChangeListener switchWeekListener =
             new CompoundButton.OnCheckedChangeListener() {
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             //Check the status of isChecked variable
             //If isChecked is true, then we are in vacation mode, we update the weekProgramText
             if(isChecked == true) {
-                weekProgramText.setText("Week program is disabled");
+                Toast.makeText(getContext(), "Week program is now disabled", Toast.LENGTH_SHORT).show();
             } else {
-                weekProgramText.setText("Week program is enabled");
+                Toast.makeText(getContext(), "Week program is now enabled", Toast.LENGTH_SHORT).show();
             }
         }
     };
