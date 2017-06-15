@@ -9,11 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.Nullable;
 import org.thermostatapp.util.HeatingSystem;
@@ -29,10 +32,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public static TextView serverDay, serverTime;
     public static TextView currentTemp, targetTemp;
     public static TextView dayTemp, nightTemp;
+    public static Switch weekSwitch;
     public static SeekBar seekBar;
-    public static TextView homeTitle;
 
     private Double currentTempVal, targetTempVal;
+    private String weekStateString;
 
     private static Double tempMin = 5.0;
     private static Double tempMax = 30.0;
@@ -62,12 +66,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         dayTemp = (TextView) view.findViewById(R.id.day_temperature);
         nightTemp = (TextView) view.findViewById(R.id.night_temperature);
         seekBar = (SeekBar) view.findViewById(R.id.temperature_seek_bar);
-        homeTitle = (TextView) view.findViewById(R.id.home_title);
+        weekSwitch = (Switch) view.findViewById(R.id.week_switch);
 
+        //Add on click listeners to different UI elements present in the home fragment
         plusButton.setOnClickListener(this);
         minusButton.setOnClickListener(this);
         dayTemp.setOnClickListener(dayTempChange);
         nightTemp.setOnClickListener(nightTempChange);
+
+        //Add action listener for the week switch
+        weekSwitch.setOnCheckedChangeListener(switchWeekListener);
 
         //Configuring variables for communicating with the server
         HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/58";
@@ -82,13 +90,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     final Double targetTemperature = Double.parseDouble(HeatingSystem.get("targetTemperature"));
                     final String dayTempString = HeatingSystem.get("dayTemperature");
                     final String nightTempString = HeatingSystem.get("nightTemperature");
+                    weekStateString = HeatingSystem.get("weekProgramState");
 
                     //Update the main variable for the current and target temperatures
                     currentTempVal = currentTemperature;
                     targetTempVal = targetTemperature;
 
                 } catch (Exception e) {
-                    System.err.println("Error occured " + e);
+                    System.err.println("Error occurred " + e);
                 }
             }
         });
@@ -103,7 +112,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             setup.join();
 
         } catch (Exception e) {
-            System.err.print("Error occured " + e);
+            System.err.print("Error occurred " + e);
         }
 
         //-------------------- FROM HERE WE CAN USE targetTemp and currentTemp VALUES --------------------\\
@@ -119,6 +128,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         seekBar.setOnSeekBarChangeListener(seekBarListener);
         //Set the progress of the seekBar
         updateSeekBar(targetTempVal);
+
+        //Set the week program state switch based on the valued retrieved from the server
+        if(weekStateString.equals("on")) {
+            weekSwitch.setChecked(false);
+        } else {
+            weekSwitch.setChecked(true);
+        }
 
         return view;
     }
@@ -190,6 +206,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //Update the target temperature both on the server and in the fragment view
     private void setTemp(final double temp) {
 
         targetTemp.setText(String.valueOf(temp) + " \u2103");
@@ -200,11 +217,42 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 try {
                     HeatingSystem.put("targetTemperature", String.valueOf(temp));
                 } catch(Exception e) {
-                    System.err.println("Error occured " + e);
+                    System.err.println("Error occurred " + e);
                 }
             }
         }).start();
     }
+
+    public CompoundButton.OnCheckedChangeListener switchWeekListener =
+            new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                //Check the status of isChecked variable
+                //If isChecked is true, then we are in vacation mode, we update the weekProgramText
+                if(isChecked == true) {
+                    Toast.makeText(getContext(), "Week program is now disabled", Toast.LENGTH_SHORT).show();
+                    //If manual mode is enabled, week program is off
+                    weekStateString = "off";
+                } else {
+                    Toast.makeText(getContext(), "Week program is now enabled", Toast.LENGTH_SHORT).show();
+                    //If manual mode is disabled, week program is on
+                    weekStateString = "on";
+                }
+
+                //Update the week program state on the server
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            HeatingSystem.put("weekProgramState", weekStateString);
+                        } catch (Exception e) {
+                            System.err.println("Error occurred " + e);
+                        }
+                    }
+                }).start();
+            }
+    };
 
     //onClickListener for updating the day temperature
     public View.OnClickListener dayTempChange =
@@ -233,7 +281,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                         try {
                                             HeatingSystem.put("dayTemperature", newTempString);
                                         } catch(Exception e) {
-                                            System.err.println("Error occured " + e);
+                                            System.err.println("Error occurred " + e);
                                         }
                                     }
                                 }).start();
@@ -282,7 +330,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                         try {
                                             HeatingSystem.put("nightTemperature", newTempString);
                                         } catch(Exception e) {
-                                            System.err.println("Error occured " + e);
+                                            System.err.println("Error occurred " + e);
                                         }
                                     }
                                 }).start();

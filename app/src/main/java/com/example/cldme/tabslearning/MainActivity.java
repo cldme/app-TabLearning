@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         final String currentTime = HeatingSystem.get("time");
                         final String dayTempString = HeatingSystem.get("dayTemperature");
                         final String nightTempString = HeatingSystem.get("nightTemperature");
+                        final String weekStateString = HeatingSystem.get("weekProgramState");
                         final Double currentTemperature = Double.parseDouble(HeatingSystem.get("currentTemperature"));
                         final Double targetTemperature = Double.parseDouble(HeatingSystem.get("targetTemperature"));
 
@@ -99,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                                 //Update the night/day temperatures input fields
                                 HomeFragment.dayTemp.setHint(dayTempString + " \u2103");
                                 HomeFragment.nightTemp.setHint(nightTempString + " \u2103");
+                                HomeFragment.dayTemp.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+                                HomeFragment.nightTemp.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
 
                                 if(targetTemperature > currentTemperature) {
                                     HomeFragment.flameImage.setVisibility(View.VISIBLE);
