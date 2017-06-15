@@ -1,5 +1,6 @@
 package com.example.cldme.tabslearning;
 
+import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -15,6 +16,8 @@ import android.widget.LinearLayout;
 
 import org.thermostatapp.util.*;
 
+import java.net.ConnectException;
+
 public class MainActivity extends AppCompatActivity {
 
     //Declare the customFragment variable to store the current fragment view
@@ -25,9 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     //Declare the fragmentTransaction
     private FragmentTransaction fragmentTransaction;
-
-    //Get the context of the application
-    final Context appContext = this;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -68,6 +68,58 @@ public class MainActivity extends AppCompatActivity {
         //Configuring variables for communicating with the server
         HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/58";
         HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
+
+        new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    //In here we can update the UI elements while retrieving new data from the server
+                    while(!isInterrupted()) {
+                        //Get all the information from the server
+                        final String currentDay = HeatingSystem.get("day");
+                        final String currentTime = HeatingSystem.get("time");
+                        final String dayTempString = HeatingSystem.get("dayTemperature");
+                        final String nightTempString = HeatingSystem.get("nightTemperature");
+                        final Double currentTemperature = Double.parseDouble(HeatingSystem.get("currentTemperature"));
+                        final Double targetTemperature = Double.parseDouble(HeatingSystem.get("targetTemperature"));
+
+                        //When we update UI elements we use runOnUiThread
+                        //(this thread runs all the time)
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Set the text for different UI elements on the home screen
+                                HomeFragment.serverDay.setText(currentDay);
+                                HomeFragment.serverTime.setText(currentTime);
+
+                                HomeFragment.currentTemp.setText(String.valueOf(currentTemperature) + " \u2103");
+                                //targetTemp.setText(String.valueOf(targetTemperature) + " \u2103");
+
+                                //Update the night/day temperatures input fields
+                                HomeFragment.dayTemp.setHint(dayTempString + " \u2103");
+                                HomeFragment.nightTemp.setHint(nightTempString + " \u2103");
+
+                                if(targetTemperature > currentTemperature) {
+                                    HomeFragment.flameImage.setVisibility(View.VISIBLE);
+                                    HomeFragment.snowflakeImage.setVisibility(View.GONE);
+                                } else if(targetTemperature < currentTemperature) {
+                                    HomeFragment.flameImage.setVisibility(View.GONE);
+                                    HomeFragment.snowflakeImage.setVisibility(View.VISIBLE);
+                                } else {
+                                    HomeFragment.flameImage.setVisibility(View.GONE);
+                                    HomeFragment.snowflakeImage.setVisibility(View.GONE);
+                                }
+                            }
+                        });
+                        //Wait some time until new information is generated on the server
+                        Thread.sleep(100);
+                    }
+                } catch(Exception e) {
+                    System.err.println("Error occured " + e);
+                }
+            }
+        }.start();
     }
 
     public void displayLayout(Fragment displayFragment) {
