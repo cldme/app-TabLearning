@@ -157,69 +157,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             closeImg[i].setVisibility(view.GONE);
         }
 
-        Thread getWeekThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    //Get the week program
-                    wpg = HeatingSystem.getWeekProgram();
-
-                    switchArrayList = wpg.data.get("Monday");
-
-                } catch(Exception e) {
-
-                }
-            }
-        });
-
-        getWeekThread.start();
-
-        try {
-            //Wait for the week program to be retrieved from the server
-            getWeekThread.join();
-
-            //Configure the UI layout to properly display the week program retrieved from the server
-            int dayIndex = 9, nightIndex = 4;
-            String hoursString, minutesString;
-            int pos = 0;
-
-            for(int i = 0; i < switchArrayList.size(); i++) {
-                String type = switchArrayList.get(i).type;
-                Boolean state = switchArrayList.get(i).state;
-                String time = switchArrayList.get(i).time;
-
-                //Get the hours from the time string
-                if(time.length() < 5) {
-                    hoursString = "" + time.charAt(0);
-                    minutesString = "" + time.charAt(1) + time.charAt(2);
-                } else {
-                    hoursString = "" + time.charAt(0) + time.charAt(1);
-                    minutesString = "" + time.charAt(3) + time.charAt(4);
-                }
-
-                //Mark the existent hours and minutes to check for duplicates in the future
-                int hours = Integer.parseInt(hoursString);
-                int minutes = Integer.parseInt(minutesString);
-
-                if(hours != 0 || minutes != 0)
-                    hoursArray[hours] = minutesArray[minutes] = 1;
-
-                if(type.equals("day")) {
-                    timesView[dayIndex].setText(time);
-                    updateSwitches(dayIndex, type, state, time);
-                    //Log.d("custom", daySwitch[dayIndex] + " " + stateSwitch[dayIndex] + " " + timeSwitch[dayIndex]);
-                    dayIndex -= 1;
-                } else {
-                    timesView[nightIndex].setText(time);
-                    updateSwitches(nightIndex, type, state, time);
-                    //Log.d("custom", daySwitch[nightIndex] + " " + stateSwitch[nightIndex] + " " + timeSwitch[nightIndex]);
-                    nightIndex -= 1;
-                }
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //Get the week program and save the switches in the switchArrayList
+        getWeekProgram();
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -333,6 +272,26 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         timerDialog.show();
     }
 
+    //Update the arrays which are used for determining duplicates when removing a switch
+    public void updateDuplicatesArray(String time) {
+        String hoursString, minutesString;
+        //Get the hours from the time string
+        if(time.length() < 5) {
+            hoursString = "" + time.charAt(0);
+            minutesString = "" + time.charAt(1) + time.charAt(2);
+        } else {
+            hoursString = "" + time.charAt(0) + time.charAt(1);
+            minutesString = "" + time.charAt(3) + time.charAt(4);
+        }
+
+        //Mark the existent hours and minutes to check for duplicates in the future
+        int hours = Integer.parseInt(hoursString);
+        int minutes = Integer.parseInt(minutesString);
+
+        hoursArray[hours] = 0;
+        minutesArray[minutes] = 0;
+    }
+
     //Update the switch arrays (type/state/time arrays)
     public void updateSwitches(int pos, String type, Boolean state, String time) {
         daySwitch[pos] = type;
@@ -347,6 +306,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
 
         //Mark that changes were made
         hasChanged = true;
+        //Mark that the changes were not updated on the server
+        hasUpdated = false;
 
         //Convert single digit minutes to two digits 7 - 07
         if(minutes < 10) {
@@ -405,47 +366,62 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClick(View view) {
 
+                //Mark that changes were made
+                hasChanged = true;
+                //Mark that the changes were not updated on the server
+                hasUpdated = false;
+
                 //Make the final time string for reseting the switches (default time)
                 String time = "00:00";
 
                 switch (view.getId()) {
                     case R.id.night_close1:
+                        updateDuplicatesArray(timesView[0].getText().toString());
                         timesView[0].setText(time);
                         updateSwitches(0, "night", false, time);
                         break;
                     case R.id.night_close2:
+                        updateDuplicatesArray(timesView[1].getText().toString());
                         timesView[1].setText(time);
                         updateSwitches(1, "night", false, time);
                         break;
                     case R.id.night_close3:
+                        updateDuplicatesArray(timesView[2].getText().toString());
                         timesView[2].setText(time);
                         updateSwitches(2, "night", false, time);
                         break;
                     case R.id.night_close4:
+                        updateDuplicatesArray(timesView[3].getText().toString());
                         timesView[3].setText(time);
                         updateSwitches(3, "night", false, time);
                         break;
                     case R.id.night_close5:
+                        updateDuplicatesArray(timesView[4].getText().toString());
                         timesView[4].setText(time);
                         updateSwitches(4, "night", false, time);
                         break;
                     case R.id.day_close1:
+                        updateDuplicatesArray(timesView[5].getText().toString());
                         timesView[5].setText(time);
                         updateSwitches(5, "day", false, time);
                         break;
                     case R.id.day_close2:
+                        updateDuplicatesArray(timesView[6].getText().toString());
                         timesView[6].setText(time);
                         updateSwitches(6, "day", false, time);
                         break;
                     case R.id.day_close3:
+                        updateDuplicatesArray(timesView[7].getText().toString());
                         timesView[7].setText(time);
                         updateSwitches(7, "day", false, time);
                         break;
                     case R.id.day_close4:
+                        updateDuplicatesArray(timesView[8].getText().toString());
                         timesView[8].setText(time);
                         updateSwitches(8, "day", false, time);
                         break;
                     case R.id.day_close5:
+                        updateDuplicatesArray(timesView[9].getText().toString());
                         timesView[9].setText(time);
                         updateSwitches(9, "day", false, time);
                         break;
@@ -459,6 +435,73 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
 
         //Return the newly created dashboardFragment object
         return programFragment;
+    }
+
+    public void getWeekProgram() {
+
+        Thread getWeekThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //Get the week program
+                    wpg = HeatingSystem.getWeekProgram();
+
+                    switchArrayList = wpg.data.get("Monday");
+
+                } catch(Exception e) {
+
+                }
+            }
+        });
+
+        getWeekThread.start();
+
+        try {
+            //Wait for the week program to be retrieved from the server
+            getWeekThread.join();
+
+            //Configure the UI layout to properly display the week program retrieved from the server
+            int dayIndex = 9, nightIndex = 4;
+            String hoursString, minutesString;
+            int pos = 0;
+
+            for(int i = 0; i < switchArrayList.size(); i++) {
+                String type = switchArrayList.get(i).type;
+                Boolean state = switchArrayList.get(i).state;
+                String time = switchArrayList.get(i).time;
+
+                //Get the hours from the time string
+                if(time.length() < 5) {
+                    hoursString = "" + time.charAt(0);
+                    minutesString = "" + time.charAt(1) + time.charAt(2);
+                } else {
+                    hoursString = "" + time.charAt(0) + time.charAt(1);
+                    minutesString = "" + time.charAt(3) + time.charAt(4);
+                }
+
+                //Mark the existent hours and minutes to check for duplicates in the future
+                int hours = Integer.parseInt(hoursString);
+                int minutes = Integer.parseInt(minutesString);
+
+                if(hours != 0 || minutes != 0)
+                    hoursArray[hours] = minutesArray[minutes] = 1;
+
+                if(type.equals("day")) {
+                    timesView[dayIndex].setText(time);
+                    updateSwitches(dayIndex, type, state, time);
+                    //Log.d("custom", daySwitch[dayIndex] + " " + stateSwitch[dayIndex] + " " + timeSwitch[dayIndex]);
+                    dayIndex -= 1;
+                } else {
+                    timesView[nightIndex].setText(time);
+                    updateSwitches(nightIndex, type, state, time);
+                    //Log.d("custom", daySwitch[nightIndex] + " " + stateSwitch[nightIndex] + " " + timeSwitch[nightIndex]);
+                    nightIndex -= 1;
+                }
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void updateWeekProgram() {
