@@ -191,15 +191,15 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             try {
-                                //Get the new week program from the UI layout
+                                //Set the switches for the new week program according to UI layout
                                 for(int i = 0; i < 10; i++) {
-                                    wpg.data.get("Monday").set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
+                                    wpg.data.get(ProgramFragment.weekDays[ProgramFragment.currentDayIndex]).set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
                                     //Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
                                 }
 
                                 //Check for duplicates (it should not happen)
                                 //If it does do not update the program and promt the user with instructions
-                                boolean duplicates = wpg.duplicates(wpg.data.get("Monday"));
+                                boolean duplicates = wpg.duplicates(wpg.data.get(ProgramFragment.weekDays[ProgramFragment.currentDayIndex]));
                                 //If no duplicates are found, update the week program
                                 if(!duplicates) {
                                     //Send the week program to be SAVED on the server

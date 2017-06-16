@@ -36,9 +36,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     //Declare an array for the close images that are in the layout
     private ImageView[] closeImg = new ImageView[10];
     //Array for storing the days of the week
-    String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    public static String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     //Variable for keeping track of the current day
-    private int currentDayIndex = 0;
+    public static int currentDayIndex = 0;
     //Hours array for checking duplicate hours
     private int[] hoursArray = new int[24];
     //Minutes array for checking duplicate minutes
@@ -98,6 +98,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progServerDay = (TextView) view.findViewById(R.id.program_day);
         progServerTime = (TextView) view.findViewById(R.id.program_time);
 
+        //Set the weekday based on the current day index
+        weekDay.setText(weekDays[currentDayIndex] + " Program");
+
         //Add action listeners to the program buttons
         progLeft.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,6 +112,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                     currentDayIndex = 6;
                 //Set the correct day of the week in the program fragment
                 weekDay.setText(weekDays[currentDayIndex] + " Program");
+                getWeekProgram();
             }
         });
 
@@ -122,6 +126,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                     currentDayIndex = 0;
                 //Set the correct day of the week in the program fragment
                 weekDay.setText(weekDays[currentDayIndex] + " Program");
+                getWeekProgram();
             }
         });
 
@@ -446,7 +451,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                     //Get the week program
                     wpg = HeatingSystem.getWeekProgram();
 
-                    switchArrayList = wpg.data.get("Monday");
+                    switchArrayList = wpg.data.get(weekDays[currentDayIndex]);
 
                 } catch(Exception e) {
 
@@ -509,15 +514,15 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             @Override
             public void run() {
                 try {
-                    //Get the new week program from the UI layout
+                    //Set the switches for the new week program according to UI layout
                     for(int i = 0; i < 10; i++) {
-                        wpg.data.get("Monday").set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
+                        wpg.data.get(weekDays[currentDayIndex]).set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
                         //Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
                     }
 
                     //Check for duplicates (it should not happen)
                     //If it does do not update the program and promt the user with instructions
-                    boolean duplicates = wpg.duplicates(wpg.data.get("Monday"));
+                    boolean duplicates = wpg.duplicates(wpg.data.get(weekDays[currentDayIndex]));
                     //If no duplicates are found, update the week program
                     if(!duplicates) {
                         //Send the week program to be SAVED on the server
