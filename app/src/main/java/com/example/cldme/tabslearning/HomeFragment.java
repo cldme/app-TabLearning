@@ -246,6 +246,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     public void run() {
                         try {
                             HeatingSystem.put("weekProgramState", weekStateString);
+                            HeatingSystem.put("targetTemperature", String.valueOf(targetTempVal));
                         } catch (Exception e) {
                             System.err.println("Error occurred " + e);
                         }
