@@ -24,45 +24,120 @@
                 android:textSize="40sp"
                 android:textAlignment="center"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
+                android:orientation="horizontal"
                 android:layout_marginTop="16dp"
-                android:id="@+id/day_time1"/>
+                android:animateLayoutChanges="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/day_time2"/>
+                <ImageView
+                    android:id="@+id/day_close1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/day_time3"/>
+                <TextView
+                    android:id="@+id/day_time1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:text="00:00"
+                    android:textSize="30sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/day_time4"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
+                android:orientation="horizontal"
                 android:layout_marginTop="16dp"
-                android:id="@+id/day_time5"/>
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/day_close2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:id="@+id/day_time2"
+                    android:layout_marginLeft="16dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/day_close3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:id="@+id/day_time3"
+                    android:layout_marginLeft="16dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/day_close4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/day_time4"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/day_close5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/day_time5"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -80,45 +155,120 @@
                 android:textSize="40sp"
                 android:textAlignment="center"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
+                android:orientation="horizontal"
                 android:layout_marginTop="16dp"
-                android:id="@+id/night_time1"/>
+                android:animateLayoutChanges="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/night_time2"/>
+                <ImageView
+                    android:id="@+id/night_close1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/night_time3"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/night_time1"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
-                android:layout_marginTop="16dp"
-                android:id="@+id/night_time4"/>
+            </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00:00"
-                android:textSize="30sp"
+                android:orientation="horizontal"
                 android:layout_marginTop="16dp"
-                android:id="@+id/night_time5"/>
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/night_close2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/night_time2"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/night_close3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/night_time3"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/night_close4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/night_time4"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:animateLayoutChanges="true">
+
+                <ImageView
+                    android:id="@+id/night_close5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00"
+                    android:textSize="30sp"
+                    android:layout_marginLeft="16dp"
+                    android:id="@+id/night_time5"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -38,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
     //Store the activity of the app for future use
     Activity appActivity = this;
 
+    //Flag for marking if the program fragment is active
+    Boolean isProgramFragActive;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -45,15 +48,23 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    //Function for checking if the changes that were made in the week program had been sent to the server
                     checkWeekProgramStatus();
                     customFragment = HomeFragment.newInstance();
+                    //Mark the program fragment as being inactive
+                    isProgramFragActive = false;
                     break;
                 case R.id.navigation_program:
                     customFragment = ProgramFragment.newInstance();
+                    //Mark the program fragment as being active
+                    isProgramFragActive = true;
                     break;
                 case R.id.navigation_notifications:
+                    //Function for checking if the changes that were made in the week program had been sent to the server
                     checkWeekProgramStatus();
                     customFragment = NotificationsFragment.newInstance();
+                    //Mark the program fragment as being inactive
+                    isProgramFragActive = false;
                     break;
             }
             displayLayout(customFragment);
@@ -80,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
         HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/58";
         HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
 
+        //Set the flag for the program fragment to false (since the app opens on the home fragment)
+        isProgramFragActive = false;
+
         new Thread() {
 
             @Override
@@ -102,8 +116,15 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 //Set the text for different UI elements on the home screen
+
+                                //Set the text for the day and time on the home page
                                 HomeFragment.serverDay.setText(currentDay);
                                 HomeFragment.serverTime.setText(currentTime);
+                                //Set the text for the day and time on the program page (only if program fragment is active)
+                                if(isProgramFragActive) {
+                                    ProgramFragment.progServerDay.setText(currentDay);
+                                    ProgramFragment.progServerTime.setText(currentTime);
+                                }
 
                                 HomeFragment.currentTemp.setText(String.valueOf(currentTemperature) + " \u2103");
                                 //targetTemp.setText(String.valueOf(targetTemperature) + " \u2103");

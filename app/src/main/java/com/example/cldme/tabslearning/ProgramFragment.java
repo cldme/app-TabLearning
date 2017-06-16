@@ -22,15 +22,23 @@ import java.util.ArrayList;
  * Created by Claudiu Ion on 09/06/2017.
  */
 
-public class ProgramFragment extends Fragment implements View.OnClickListener{
+public class ProgramFragment extends Fragment implements View.OnClickListener {
 
     //Declare variables for the different view items on the programFragment page
-    Button addButton;
-    Button saveButton;
-    Button resetButton;
+    Button removeButton, saveButton, resetButton;
+    //Declare variables for the server day and time
+    public static TextView progServerDay, progServerTime;
+    public static ImageButton progLeft, progRight;
+    public static TextView weekDay;
 
     //Declare an array for the text views that are in the layout
     private TextView[] timesView = new TextView[10];
+    //Declare an array for the close images that are in the layout
+    private ImageView[] closeImg = new ImageView[10];
+    //Array for storing the days of the week
+    String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    //Variable for keeping track of the current day
+    private int currentDayIndex = 0;
     //Hours array for checking duplicate hours
     private int[] hoursArray = new int[24];
     //Minutes array for checking duplicate minutes
@@ -44,6 +52,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
     public static Boolean hasChanged;
     //Flag variable for keeping tack of week program update
     public static Boolean hasUpdated;
+    //Flag variable for keeping track of the close images being open/close
+    public static Boolean imgAreShown;
 
     //Declare the switch array list (as retrieved from the server)
     ArrayList<Switch> switchArrayList = new ArrayList<Switch>();
@@ -75,11 +85,45 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
         hasChanged = false;
         //When the program fragment is loaded no updates were made
         hasUpdated = false;
+        //When the program fragment is loaded close images are hidden
+        imgAreShown = false;
 
         //Get the different elements that are in the programFragment
-        addButton = (Button) view.findViewById(R.id.add_button);
+        removeButton = (Button) view.findViewById(R.id.remove_button);
         saveButton = (Button) view.findViewById(R.id.save_button);
         resetButton = (Button) view.findViewById(R.id.reset_button);
+        weekDay = (TextView) view.findViewById(R.id.week_day);
+        progLeft = (ImageButton) view.findViewById(R.id.program_left);
+        progRight = (ImageButton) view.findViewById(R.id.program_right);
+        progServerDay = (TextView) view.findViewById(R.id.program_day);
+        progServerTime = (TextView) view.findViewById(R.id.program_time);
+
+        //Add action listeners to the program buttons
+        progLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Decrease the currentDayIndex to display the previous day of the week
+                currentDayIndex -= 1;
+                //If we reach the start of the week we return to the end
+                if(currentDayIndex < 0)
+                    currentDayIndex = 6;
+                //Set the correct day of the week in the program fragment
+                weekDay.setText(weekDays[currentDayIndex] + " Program");
+            }
+        });
+
+        progRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Increase the currentDayIndex to display the next day of the week
+                currentDayIndex += 1;
+                //If we reach the end of the week we return to the beginning
+                if(currentDayIndex > 6)
+                    currentDayIndex = 0;
+                //Set the correct day of the week in the program fragment
+                weekDay.setText(weekDays[currentDayIndex] + " Program");
+            }
+        });
 
         //Get all the text views from the fragment view
         timesView[0] = (TextView) view.findViewById(R.id.night_time1);
@@ -93,12 +137,27 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
         timesView[8] = (TextView) view.findViewById(R.id.day_time4);
         timesView[9] = (TextView) view.findViewById(R.id.day_time5);
 
+        //Get all the image view from the fragment view
+        closeImg[0] = (ImageView) view.findViewById(R.id.night_close1);
+        closeImg[1] = (ImageView) view.findViewById(R.id.night_close2);
+        closeImg[2] = (ImageView) view.findViewById(R.id.night_close3);
+        closeImg[3] = (ImageView) view.findViewById(R.id.night_close4);
+        closeImg[4] = (ImageView) view.findViewById(R.id.night_close5);
+        closeImg[5] = (ImageView) view.findViewById(R.id.day_close1);
+        closeImg[6] = (ImageView) view.findViewById(R.id.day_close2);
+        closeImg[7] = (ImageView) view.findViewById(R.id.day_close3);
+        closeImg[8] = (ImageView) view.findViewById(R.id.day_close4);
+        closeImg[9] = (ImageView) view.findViewById(R.id.day_close5);
+
+
         for(int i = 0; i < 10; i++) {
             timesView[i].setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
             timesView[i].setOnClickListener(this);
+            closeImg[i].setOnClickListener(closeImageListener);
+            closeImg[i].setVisibility(view.GONE);
         }
 
-        Thread thread = new Thread(new Runnable() {
+        Thread getWeekThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -113,11 +172,11 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
             }
         });
 
-        thread.start();
+        getWeekThread.start();
 
         try {
             //Wait for the week program to be retrieved from the server
-            thread.join();
+            getWeekThread.join();
 
             //Configure the UI layout to properly display the week program retrieved from the server
             int dayIndex = 9, nightIndex = 4;
@@ -162,45 +221,26 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
             e.printStackTrace();
         }
 
-        addButton.setOnClickListener(new View.OnClickListener() {
+        removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(View view) {
+                for(int i = 0; i < 10; i++) {
+                    if(!imgAreShown)
+                        closeImg[i].setVisibility(view.VISIBLE);
+                    else
+                        closeImg[i].setVisibility(view.GONE);
+                }
+                //Toggle the flag to keep track of the close images
+                imgAreShown = !imgAreShown;
+                //If flag is false, update the week program with the new switches
+                updateWeekProgram();
             }
         });
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            //Get the new week program from the UI layout
-                            for(int i = 0; i < 10; i++) {
-                                wpg.data.get("Monday").set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
-                                //Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
-                            }
-
-                            //Check for duplicates (it should not happen)
-                            //If it does do not update the program and promt the user with instructions
-                            boolean duplicates = wpg.duplicates(wpg.data.get("Monday"));
-                            //If no duplicates are found, update the week program
-                            if(!duplicates) {
-                                //Send the week program to be SAVED on the server
-                                HeatingSystem.setWeekProgram(wpg);
-                            } else {
-                                Toast.makeText(getContext(), "There was an error with the program. Please check for duplicates", Toast.LENGTH_LONG).show();
-                            }
-
-                            //Mark that the program was updated on the server
-                            hasUpdated = true;
-
-                        } catch (Exception e) {
-
-                        }
-                    }
-                }).start();
+                updateWeekProgram();
                 Toast.makeText(getContext(), "The program is now saved", Toast.LENGTH_SHORT).show();
             }
         });
@@ -360,12 +400,106 @@ public class ProgramFragment extends Fragment implements View.OnClickListener{
         }
     }
 
+    public View.OnClickListener closeImageListener =
+            new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //Make the final time string for reseting the switches (default time)
+                String time = "00:00";
+
+                switch (view.getId()) {
+                    case R.id.night_close1:
+                        timesView[0].setText(time);
+                        updateSwitches(0, "night", false, time);
+                        break;
+                    case R.id.night_close2:
+                        timesView[1].setText(time);
+                        updateSwitches(1, "night", false, time);
+                        break;
+                    case R.id.night_close3:
+                        timesView[2].setText(time);
+                        updateSwitches(2, "night", false, time);
+                        break;
+                    case R.id.night_close4:
+                        timesView[3].setText(time);
+                        updateSwitches(3, "night", false, time);
+                        break;
+                    case R.id.night_close5:
+                        timesView[4].setText(time);
+                        updateSwitches(4, "night", false, time);
+                        break;
+                    case R.id.day_close1:
+                        timesView[5].setText(time);
+                        updateSwitches(5, "day", false, time);
+                        break;
+                    case R.id.day_close2:
+                        timesView[6].setText(time);
+                        updateSwitches(6, "day", false, time);
+                        break;
+                    case R.id.day_close3:
+                        timesView[7].setText(time);
+                        updateSwitches(7, "day", false, time);
+                        break;
+                    case R.id.day_close4:
+                        timesView[8].setText(time);
+                        updateSwitches(8, "day", false, time);
+                        break;
+                    case R.id.day_close5:
+                        timesView[9].setText(time);
+                        updateSwitches(9, "day", false, time);
+                        break;
+                }
+            }
+    };
+
     public static ProgramFragment newInstance() {
         //Create a new DashboardFragment object
         ProgramFragment programFragment = new ProgramFragment();
 
         //Return the newly created dashboardFragment object
         return programFragment;
+    }
+
+    public void updateWeekProgram() {
+        Thread updateThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    //Get the new week program from the UI layout
+                    for(int i = 0; i < 10; i++) {
+                        wpg.data.get("Monday").set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
+                        //Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
+                    }
+
+                    //Check for duplicates (it should not happen)
+                    //If it does do not update the program and promt the user with instructions
+                    boolean duplicates = wpg.duplicates(wpg.data.get("Monday"));
+                    //If no duplicates are found, update the week program
+                    if(!duplicates) {
+                        //Send the week program to be SAVED on the server
+                        HeatingSystem.setWeekProgram(wpg);
+                    } else {
+                        Toast.makeText(getContext(), "There was an error with the program. Please check for duplicates", Toast.LENGTH_LONG).show();
+                    }
+
+                    //Mark that the program was updated on the server
+                    hasUpdated = true;
+
+                } catch (Exception e) {
+
+                }
+            }
+        });
+
+        updateThread.start();
+
+        try {
+            //Wait for the update thread to finish
+            updateThread.join();
+        } catch (Exception e) {
+
+        }
     }
 
     public void setDefaultWeekProgram() {

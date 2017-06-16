@@ -10,12 +10,14 @@
         android:layout_margin="16dp">
 
         <TextView
+            android:id="@+id/program_day"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Friday"
             android:layout_alignParentLeft="true"/>
 
         <TextView
+            android:id="@+id/program_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="12:30"
@@ -23,13 +25,39 @@
 
     </RelativeLayout>
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Program Page"
-        android:textSize="20sp"
         android:layout_margin="16dp"
-        android:textAlignment="center"/>
+        android:orientation="horizontal"
+        android:animateLayoutChanges="true">
+
+        <ImageButton
+            android:id="@+id/program_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_left"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"/>
+
+        <TextView
+            android:id="@+id/week_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday Program"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:layout_weight="1"/>
+
+        <ImageButton
+            android:id="@+id/program_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_right"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,7 +71,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/add_button"
+                android:id="@+id/remove_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
