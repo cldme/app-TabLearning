@@ -2,7 +2,6 @@ package com.example.cldme.tabslearning;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,7 +13,6 @@ import android.widget.*;
 import org.thermostatapp.util.*;
 import org.thermostatapp.util.Switch;
 
-import java.security.spec.ECField;
 import java.util.ArrayList;
 
 /**
@@ -81,8 +79,20 @@ public class ProgramFragment extends Fragment {
             //Wait for the week program to be retrieved from the server
             thread.join();
 
+            //Configure the new custom array to hold day and night switches alternatively
+            /*
+            int posOffset = switchArrayList.size() / 2;
+            int position = 0;
+
+            for(int i = 0; i < switchArrayList.size() / 2; i++) {
+                customSwitchArrayList.add(position, switchArrayList.get(i + posOffset));
+                customSwitchArrayList.add(position + 1, switchArrayList.get(i));
+                position += 2;
+            }
+            */
+
             //Configure the array adapter
-            adapter = new CustomArrayAdapter(ProgramFragment.this, view.getContext(), switchArrayList);
+            adapter = new CustomArrayAdapter(ProgramFragment.this, view.getContext(), customSwitchArrayList);
 
             //Set the list adapter for the listItems
             itemList.setAdapter(adapter);
