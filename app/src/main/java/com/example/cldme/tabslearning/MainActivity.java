@@ -3,7 +3,7 @@ package com.example.cldme.tabslearning;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,13 +11,18 @@ import android.support.design.widget.BottomNavigationView;
 import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.Toast;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 
 import org.thermostatapp.util.*;
 
-import java.net.ConnectException;
+import static com.example.cldme.tabslearning.ProgramFragment.daySwitch;
+import static com.example.cldme.tabslearning.ProgramFragment.stateSwitch;
+import static com.example.cldme.tabslearning.ProgramFragment.timeSwitch;
+import static com.example.cldme.tabslearning.ProgramFragment.wpg;
+import static com.example.cldme.tabslearning.ProgramFragment.hasUpdated;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     //Declare the fragmentTransaction
     private FragmentTransaction fragmentTransaction;
 
+    //Store the activity of the app for future use
+    Activity appActivity = this;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -37,12 +45,14 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
+                    checkWeekProgramStatus();
                     customFragment = HomeFragment.newInstance();
                     break;
                 case R.id.navigation_program:
                     customFragment = ProgramFragment.newInstance();
                     break;
                 case R.id.navigation_notifications:
+                    checkWeekProgramStatus();
                     customFragment = NotificationsFragment.newInstance();
                     break;
             }
@@ -138,5 +148,69 @@ public class MainActivity extends AppCompatActivity {
 
         //Commit the changes to the view
         fragmentTransaction.commit();
+    }
+
+    public void checkWeekProgramStatus() {
+        if(ProgramFragment.hasChanged && !ProgramFragment.hasUpdated) {
+
+            AlertDialog.Builder theDialog = new AlertDialog.Builder(appActivity);
+
+            // Set the title for the Dialog
+            theDialog.setTitle("Save Changes");
+
+            // Set the message
+            theDialog.setMessage("You have unsaved changes. Do you want to save them ?");
+
+            // Add text for a positive button
+            theDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                //Get the new week program from the UI layout
+                                for(int i = 0; i < 10; i++) {
+                                    wpg.data.get("Monday").set(i, new Switch(daySwitch[i], stateSwitch[i], timeSwitch[i]));
+                                    //Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
+                                }
+
+                                //Check for duplicates (it should not happen)
+                                //If it does do not update the program and promt the user with instructions
+                                boolean duplicates = wpg.duplicates(wpg.data.get("Monday"));
+                                //If no duplicates are found, update the week program
+                                if(!duplicates) {
+                                    //Send the week program to be SAVED on the server
+                                    HeatingSystem.setWeekProgram(wpg);
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "There was an error with the program. Please check for duplicates", Toast.LENGTH_LONG);
+                                }
+
+                                //Mark that the program was updated on the server
+                                hasUpdated = true;
+
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }).start();
+
+                    Toast.makeText(getApplicationContext(), "The changes were saved", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Add text for a negative button
+            theDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    Toast.makeText(getApplicationContext(), "The changes were not saved", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Returns the created dialog
+            theDialog.create().show();
+        }
     }
 }

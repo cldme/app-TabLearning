@@ -64,8 +64,8 @@ public class CustomArrayAdapter extends ArrayAdapter<Switch> {
         final View finalConvertView = convertView;
 
         //Get the elements that are in the custom_row.xml file for data population
-        textView = (TextView) convertView.findViewById(R.id.day_text);
-        timeText = (TextView) convertView.findViewById(R.id.day_time);
+        //textView = (TextView) convertView.findViewById(R.id.day_text);
+        //timeText = (TextView) convertView.findViewById(R.id.day_time);
 
         //Set the text inside the text view (random text is placeholder)
         String typeSwitch = customSwitch.type;
