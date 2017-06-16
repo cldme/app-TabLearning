@@ -1,9 +1,11 @@
 package com.example.cldme.tabslearning;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -105,6 +107,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //We check to see if unsaved changes are being lost
+                checkWeekProgramStatus(currentDayIndex, daySwitch, stateSwitch, timeSwitch);
                 //Decrease the currentDayIndex to display the previous day of the week
                 currentDayIndex -= 1;
                 //If we reach the start of the week we return to the end
@@ -119,6 +123,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //We check to see if unsaved changes are being lost
+                checkWeekProgramStatus(currentDayIndex, daySwitch, stateSwitch, timeSwitch);
                 //Increase the currentDayIndex to display the next day of the week
                 currentDayIndex += 1;
                 //If we reach the end of the week we return to the beginning
@@ -442,6 +448,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         return programFragment;
     }
 
+    //Get the week program from the server, based on the weekDays[currentDayIndex] day
     public void getWeekProgram() {
 
         Thread getWeekThread = new Thread(new Runnable() {
@@ -464,6 +471,14 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         try {
             //Wait for the week program to be retrieved from the server
             getWeekThread.join();
+
+            //Reset the arrays which are checking for doubles
+            for(int i = 0; i < hoursArray.length; i++) {
+                hoursArray[i] = 0;
+            }
+            for(int i = 0; i < minutesArray.length; i++) {
+                minutesArray[i] = 0;
+            }
 
             //Configure the UI layout to properly display the week program retrieved from the server
             int dayIndex = 9, nightIndex = 4;
@@ -509,6 +524,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    //Put the new week program on the server, based on the weekDays[currentDayIndex] day
     public void updateWeekProgram() {
         Thread updateThread = new Thread(new Runnable() {
             @Override
@@ -531,9 +547,6 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                         Toast.makeText(getContext(), "There was an error with the program. Please check for duplicates", Toast.LENGTH_LONG).show();
                     }
 
-                    //Mark that the program was updated on the server
-                    hasUpdated = true;
-
                 } catch (Exception e) {
 
                 }
@@ -545,11 +558,14 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         try {
             //Wait for the update thread to finish
             updateThread.join();
+            //Mark that the program was updated on the server
+            hasUpdated = true;
         } catch (Exception e) {
 
         }
     }
 
+    //Reset the week program on the server (default program has all switches turned off and set to 0:00)
     public void setDefaultWeekProgram() {
         new Thread(new Runnable() {
             @Override
@@ -579,5 +595,81 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 }
             }
         }).start();
+    }
+
+    //Checks whether or not the program was changed but not updated on the server, in which case it updates the program
+    public void checkWeekProgramStatus(final int pos, final String[] daySwitch, final Boolean[] stateSwitch, final String[] timeSwitch) {
+        if(ProgramFragment.hasChanged && !ProgramFragment.hasUpdated) {
+            final String customDay = weekDays[pos];
+            final String[] days = new String[10];
+            final Boolean[] state = new Boolean[10];
+            final String[] time = new String[10];
+
+            for(int i = 0; i < 10; i++) {
+                Log.d("custom", daySwitch[i] + " " + stateSwitch[i] + " " + timeSwitch[i]);
+                days[i] = daySwitch[i];
+                state[i] = stateSwitch[i];
+                time[i] = timeSwitch[i];
+            }
+
+            AlertDialog.Builder theDialog = new AlertDialog.Builder(getActivity());
+
+            // Set the title for the Dialog
+            theDialog.setTitle("Save Changes");
+
+            // Set the message
+            theDialog.setMessage("You have unsaved changes. Do you want to save them ?");
+
+            // Add text for a positive button
+            theDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                //Set the switches for the new week program according to UI layout
+                                for(int i = 0; i < 10; i++) {
+                                    wpg.data.get(customDay).set(i, new Switch(days[i], state[i], time[i]));
+                                    Log.d("custom1", days[i] + " " + state[i] + " " + time[i]);
+                                }
+
+                                //Check for duplicates (it should not happen)
+                                //If it does do not update the program and promt the user with instructions
+                                boolean duplicates = wpg.duplicates(wpg.data.get(customDay));
+                                //If no duplicates are found, update the week program
+                                if(!duplicates) {
+                                    //Send the week program to be SAVED on the server
+                                    HeatingSystem.setWeekProgram(wpg);
+                                } else {
+                                    Toast.makeText(getContext(), "There was an error with the program. Please check for duplicates", Toast.LENGTH_LONG);
+                                }
+
+                                //Mark that the program was updated on the server
+                                hasUpdated = true;
+
+                            } catch (Exception e) {
+
+                            }
+                        }
+                    }).start();
+
+                    Toast.makeText(getContext(), "The changes were saved", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Add text for a negative button
+            theDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    Toast.makeText(getContext(), "The changes were not saved", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            // Returns the created dialog
+            theDialog.create().show();
+        }
     }
 }
