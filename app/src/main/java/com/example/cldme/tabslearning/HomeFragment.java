@@ -34,9 +34,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public static TextView dayTemp, nightTemp;
     public static Switch weekSwitch;
     public static SeekBar seekBar;
+    public static Button changeButton;
 
     private Double currentTempVal, targetTempVal;
     private String weekStateString;
+
+    //Set variables for day and night temperatures
+    private String dayTempServer, nightTempServer;
+    double newDayTemp, newNightTemp;
 
     private static Double tempMin = 5.0;
     private static Double tempMax = 30.0;
@@ -67,12 +72,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         nightTemp = (TextView) view.findViewById(R.id.night_temperature);
         seekBar = (SeekBar) view.findViewById(R.id.temperature_seek_bar);
         weekSwitch = (Switch) view.findViewById(R.id.week_switch);
+        changeButton = (Button) view.findViewById(R.id.change_temperature);
 
         //Add on click listeners to different UI elements present in the home fragment
         plusButton.setOnClickListener(this);
         minusButton.setOnClickListener(this);
         dayTemp.setOnClickListener(dayTempChange);
         nightTemp.setOnClickListener(nightTempChange);
+        changeButton.setOnClickListener(changeTempButton);
 
         //Add action listener for the week switch
         weekSwitch.setOnCheckedChangeListener(switchWeekListener);
@@ -90,6 +97,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     final Double targetTemperature = Double.parseDouble(HeatingSystem.get("targetTemperature"));
                     final String dayTempString = HeatingSystem.get("dayTemperature");
                     final String nightTempString = HeatingSystem.get("nightTemperature");
+
+                    //Get the day an night temperatures to be used in the custom change dialog
+                    dayTempServer = HeatingSystem.get("dayTemperature");
+                    nightTempServer = HeatingSystem.get("nightTemperature");
+
                     weekStateString = HeatingSystem.get("weekProgramState");
 
                     //Update the main variable for the current and target temperatures
@@ -128,6 +140,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         seekBar.setOnSeekBarChangeListener(seekBarListener);
         //Set the progress of the seekBar
         updateSeekBar(targetTempVal);
+
+        //Set double variables for day and night temperatures
+        newDayTemp = Double.parseDouble(dayTempServer);
+        newNightTemp = Double.parseDouble(nightTempServer);
 
         //Set the week program state switch based on the valued retrieved from the server
         if(weekStateString.equals("on")) {
@@ -209,7 +225,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     //Update the target temperature both on the server and in the fragment view
     private void setTemp(final double temp) {
 
-        targetTemp.setText(String.valueOf(temp) + " \u2103");
+        Double customTemp = temp;
+        customTemp = (Math.round(customTemp * 100) / 10) / 10.0;
+
+        targetTemp.setText(String.valueOf(customTemp) + " \u2103");
 
         new Thread(new Runnable() {
             @Override
@@ -259,98 +278,191 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public View.OnClickListener dayTempChange =
             new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    final Dialog tempDialog = new Dialog(viewContext);
+            @Override
+            public void onClick(View v) {
+                final Dialog tempDialog = new Dialog(viewContext);
 
-                    tempDialog.setContentView(R.layout.temperature_dialog);
+                tempDialog.setContentView(R.layout.temperature_dialog);
 
-                    Button okButton = (Button) tempDialog.findViewById(R.id.temp_ok_button);
-                    Button cancelButton = (Button) tempDialog.findViewById(R.id.temp_cancel_button);
-                    final EditText newTemp = (EditText) tempDialog.findViewById(R.id.new_temperature);
+                Button okButton = (Button) tempDialog.findViewById(R.id.temp_ok_button);
+                Button cancelButton = (Button) tempDialog.findViewById(R.id.temp_cancel_button);
+                final EditText newTemp = (EditText) tempDialog.findViewById(R.id.new_temperature);
 
-                    okButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //Check if the newTemp field is not empty
-                            if(newTemp.getText().toString().length() > 0) {
-                                final String newTempString = String.valueOf(newTemp.getText());
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Check if the newTemp field is not empty
+                        if(newTemp.getText().toString().length() > 0) {
+                            final String newTempString = String.valueOf(newTemp.getText());
 
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            HeatingSystem.put("dayTemperature", newTempString);
-                                        } catch(Exception e) {
-                                            System.err.println("Error occurred " + e);
-                                        }
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        HeatingSystem.put("dayTemperature", newTempString);
+                                    } catch(Exception e) {
+                                        System.err.println("Error occurred " + e);
                                     }
-                                }).start();
-                            }
-
-                            //Close the temperature dialog
-                            tempDialog.dismiss();
+                                }
+                            }).start();
                         }
-                    });
 
-                    cancelButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            tempDialog.dismiss();
-                        }
-                    });
+                        //Close the temperature dialog
+                        tempDialog.dismiss();
+                    }
+                });
 
-                    tempDialog.show();
-                }
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tempDialog.dismiss();
+                    }
+                });
+
+                tempDialog.show();
+            }
     };
 
     //onClickListener for updating the night temperature
     public View.OnClickListener nightTempChange =
             new View.OnClickListener() {
 
-                @Override
-                public void onClick(View v) {
-                    final Dialog tempDialog = new Dialog(viewContext);
+            @Override
+            public void onClick(View v) {
+                final Dialog tempDialog = new Dialog(viewContext);
 
-                    tempDialog.setContentView(R.layout.temperature_dialog);
+                tempDialog.setContentView(R.layout.temperature_dialog);
 
-                    Button okButton = (Button) tempDialog.findViewById(R.id.temp_ok_button);
-                    Button cancelButton = (Button) tempDialog.findViewById(R.id.temp_cancel_button);
-                    final EditText newTemp = (EditText) tempDialog.findViewById(R.id.new_temperature);
+                Button okButton = (Button) tempDialog.findViewById(R.id.temp_ok_button);
+                Button cancelButton = (Button) tempDialog.findViewById(R.id.temp_cancel_button);
+                final EditText newTemp = (EditText) tempDialog.findViewById(R.id.new_temperature);
 
-                    okButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //Check if the newTemp field is not empty
-                            if(newTemp.getText().toString().length() > 0) {
-                                final String newTempString = String.valueOf(newTemp.getText());
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //Check if the newTemp field is not empty
+                        if(newTemp.getText().toString().length() > 0) {
+                            final String newTempString = String.valueOf(newTemp.getText());
 
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            HeatingSystem.put("nightTemperature", newTempString);
-                                        } catch(Exception e) {
-                                            System.err.println("Error occurred " + e);
-                                        }
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        HeatingSystem.put("nightTemperature", newTempString);
+                                    } catch(Exception e) {
+                                        System.err.println("Error occurred " + e);
                                     }
-                                }).start();
+                                }
+                            }).start();
+                        }
+
+                        //Close the temperature dialog
+                        tempDialog.dismiss();
+                    }
+                });
+
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tempDialog.dismiss();
+                    }
+                });
+
+                tempDialog.show();
+            }
+    };
+
+    public View.OnClickListener changeTempButton =
+            new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                final Dialog tempDialog = new Dialog(viewContext);
+
+                tempDialog.setContentView(R.layout.temperature_change_dialog);
+
+                Button okButton = (Button) tempDialog.findViewById(R.id.dialog_temp_ok);
+                Button cancelButton = (Button) tempDialog.findViewById(R.id.dialog_temp_cancel);
+                final TextView dayTemp = (TextView) tempDialog.findViewById(R.id.dialog_new_day_temp);
+                final TextView nightTemp = (TextView) tempDialog.findViewById(R.id.dialog_new_night_temp);
+                ImageButton dayPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_day);
+                ImageButton dayMinus = (ImageButton) tempDialog.findViewById(R.id.dialog_minus_button_day);
+                ImageButton nightPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_night);
+                ImageButton nightMinus = (ImageButton) tempDialog.findViewById(R.id.dialog_minus_button_night);
+
+                //Set the day and night temperatures as retrieved from the server
+                dayTemp.setText(newDayTemp + " \u2103");
+                nightTemp.setText(newNightTemp + " \u2103");
+
+                dayPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        newDayTemp = Math.round((newDayTemp + 0.1) * 10.0) / 10.0 ;
+                        dayTemp.setText(newDayTemp + " \u2103");
+                    }
+                });
+
+                dayMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        newDayTemp = Math.round((newDayTemp - 0.1) * 10.0) / 10.0;
+                        dayTemp.setText(newDayTemp + " \u2103");
+                    }
+                });
+
+                nightPlus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        newNightTemp = Math.round((newNightTemp + 0.1) * 10.0) / 10.0 ;
+                        nightTemp.setText(newNightTemp + " \u2103");
+                    }
+                });
+
+                nightMinus.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        newNightTemp = Math.round((newNightTemp - 0.1) * 10.0) / 10.0;
+                        nightTemp.setText(newNightTemp + " \u2103");
+                    }
+                });
+
+                okButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        final String newDayTempString = String.valueOf(newDayTemp);
+                        final String newNightTempString = String.valueOf(newNightTemp);
+
+                        Log.d("custom", "newDayTemp: " + newDayTempString);
+                        Log.d("custom", "newNightTemp: " + newNightTempString);
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+
+                                    HeatingSystem.put("dayTemperature", newDayTempString);
+                                    HeatingSystem.put("nightTemperature", newNightTempString);
+
+                                } catch (Exception e) {
+                                    System.err.println("Error occurred " + e);
+                                }
                             }
+                        }).start();
 
-                            //Close the temperature dialog
-                            tempDialog.dismiss();
-                        }
-                    });
+                        tempDialog.dismiss();
+                    }
+                });
 
-                    cancelButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            tempDialog.dismiss();
-                        }
-                    });
+                cancelButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tempDialog.dismiss();
+                    }
+                });
 
-                    tempDialog.show();
-                }
+                tempDialog.show();
+            }
     };
 
 }

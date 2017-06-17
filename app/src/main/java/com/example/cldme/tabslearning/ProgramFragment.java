@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -71,6 +72,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     //Store the context of the current fragment for future use
     private Context viewContext;
 
+    //Declare a variable to make the device vibrate on clicks
+    Vibrator vibe;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +93,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         hasUpdated = false;
         //When the program fragment is loaded close images are hidden
         imgAreShown = false;
+        //Get the context for the vibrate variable
+        vibe = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
 
         //Get the different elements that are in the programFragment
         removeButton = (Button) view.findViewById(R.id.remove_button);
@@ -107,6 +113,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Make device vibrate in order to give user a feedback
+                vibe.vibrate(100);
                 //We check to see if unsaved changes are being lost
                 checkWeekProgramStatus(currentDayIndex, daySwitch, stateSwitch, timeSwitch);
                 //Decrease the currentDayIndex to display the previous day of the week
@@ -123,6 +131,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         progRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Make device vibrate in order to give user a feedback
+                vibe.vibrate(100);
                 //We check to see if unsaved changes are being lost
                 checkWeekProgramStatus(currentDayIndex, daySwitch, stateSwitch, timeSwitch);
                 //Increase the currentDayIndex to display the next day of the week
@@ -198,36 +208,64 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Thread resetThread = new Thread(new Runnable() {
+
+                vibe.vibrate(700);
+
+                final AlertDialog.Builder theDialog = new AlertDialog.Builder(getActivity());
+
+                // Set the title for the Dialog
+                theDialog.setTitle("Reset Program");
+
+                // Set the message
+                theDialog.setMessage("This will reset the weekly program. All switches will be removed and you will loose all changes. Are you sure ?");
+
+                //Add the positive button
+                theDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
-                    public void run() {
-                        setDefaultWeekProgram();
-                        FragmentTransaction frgTransaction = getFragmentManager().beginTransaction();
-                        frgTransaction.detach(currentFragment).attach(currentFragment).commit();
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        Thread resetThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDefaultWeekProgram();
+                                FragmentTransaction frgTransaction = getFragmentManager().beginTransaction();
+                                frgTransaction.detach(currentFragment).attach(currentFragment).commit();
+
+                                try {
+                                    Thread.sleep(100);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        resetThread.start();
 
                         try {
-                            Thread.sleep(100);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            //Wait for the thread to finish update the data on the server
+                            resetThread.join();
+                            //Prompt user with message that the week program is now reset
+                            Toast.makeText(getContext(), "The program was reset to default", Toast.LENGTH_SHORT).show();
+                            //Reset the hours and minutes array to be used for duplicate checking again
+                            for(int i = 0; i < hoursArray.length; i++)
+                                hoursArray[i] = 0;
+                            for(int i = 0; i < minutesArray.length; i++)
+                                minutesArray[i] = 0;
+                        } catch (Exception e) {
+                            System.err.println("Error occurred " + e);
                         }
                     }
                 });
 
-                resetThread.start();
+                theDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                try {
-                    //Wait for the thread to finish update the data on the server
-                    resetThread.join();
-                    //Prompt user with message that the week program is now reset
-                    Toast.makeText(getContext(), "The program was reset to default", Toast.LENGTH_SHORT).show();
-                    //Reset the hours and minutes array to be used for duplicate checking again
-                    for(int i = 0; i < hoursArray.length; i++)
-                        hoursArray[i] = 0;
-                    for(int i = 0; i < minutesArray.length; i++)
-                        minutesArray[i] = 0;
-                } catch (Exception e) {
-                    System.err.println("Error occurred " + e);
-                }
+                    }
+                });
+
+                // Returns the created dialog
+                theDialog.create().show();
             }
         });
 

@@ -190,44 +190,62 @@
                 android:orientation="vertical">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
                     android:orientation="horizontal">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Day Temperature "
-                        android:textSize="20sp" />
+                        android:orientation="vertical"
+                        android:gravity="center|bottom">
 
-                    <TextView
-                        android:id="@+id/day_temperature"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Day Temperature "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/day_temperature"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/day_temp_string"
+                                android:textSize="17sp"/>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Night Temperature "
+                                android:textSize="20sp" />
+
+                            <TextView
+                                android:id="@+id/night_temperature"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/night_temp_string"
+                                android:textSize="17sp"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <Button
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="@string/day_temp_string"
-                        android:textSize="17sp"/>
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Night Temperature "
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:id="@+id/night_temperature"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/night_temp_string"
-                        android:textSize="17sp"/>
+                        android:text="Change"
+                        android:layout_marginLeft="16dp"
+                        android:id="@+id/change_temperature"/>
 
                 </LinearLayout>
 
