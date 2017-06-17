@@ -40,8 +40,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     private String weekStateString;
 
     //Set variables for day and night temperatures
-    private String dayTempServer, nightTempServer;
-    double newDayTemp, newNightTemp;
+    public static double newDayTemp, newNightTemp;
 
     private static Double tempMin = 5.0;
     private static Double tempMax = 30.0;
@@ -98,10 +97,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     final String dayTempString = HeatingSystem.get("dayTemperature");
                     final String nightTempString = HeatingSystem.get("nightTemperature");
 
-                    //Get the day an night temperatures to be used in the custom change dialog
-                    dayTempServer = HeatingSystem.get("dayTemperature");
-                    nightTempServer = HeatingSystem.get("nightTemperature");
-
                     weekStateString = HeatingSystem.get("weekProgramState");
 
                     //Update the main variable for the current and target temperatures
@@ -140,10 +135,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         seekBar.setOnSeekBarChangeListener(seekBarListener);
         //Set the progress of the seekBar
         updateSeekBar(targetTempVal);
-
-        //Set double variables for day and night temperatures
-        newDayTemp = Double.parseDouble(dayTempServer);
-        newNightTemp = Double.parseDouble(nightTempServer);
 
         //Set the week program state switch based on the valued retrieved from the server
         if(weekStateString.equals("on")) {
@@ -390,6 +381,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 ImageButton nightPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_night);
                 ImageButton nightMinus = (ImageButton) tempDialog.findViewById(R.id.dialog_minus_button_night);
 
+                Thread getTemp = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String newDayTempString = HeatingSystem.get("dayTemperature");
+                            String newNightTempString = HeatingSystem.get("nightTemperature");
+
+                            newDayTemp = Double.parseDouble(newDayTempString);
+                            newNightTemp = Double.parseDouble(newNightTempString);
+                        } catch (Exception e) {
+                            System.err.println("Error occurred " + e);
+                        }
+                    }
+                });
+
+                getTemp.start();
+
+                try{
+                    getTemp.join();
+                } catch (Exception e) {
+                    System.err.println("Error occurred " + e);
+                }
+
                 //Set the day and night temperatures as retrieved from the server
                 dayTemp.setText(newDayTemp + " \u2103");
                 nightTemp.setText(newNightTemp + " \u2103");
@@ -436,7 +450,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         Log.d("custom", "newDayTemp: " + newDayTempString);
                         Log.d("custom", "newNightTemp: " + newNightTempString);
 
-                        new Thread(new Runnable() {
+                        Thread tempSetup = new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -448,7 +462,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                                     System.err.println("Error occurred " + e);
                                 }
                             }
-                        }).start();
+                        });
+
+                        tempSetup.start();
+
+                        try {
+                            tempSetup.join();
+                        } catch (Exception e) {
+                            System.err.println("Error occurred " + e);
+                        }
 
                         tempDialog.dismiss();
                     }
