@@ -11,16 +11,16 @@
         android:layout_height="wrap_content"
         android:text="Day Temperature"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="30sp"/>
+        android:textSize="25sp"/>
 
     <TextView
+        android:id="@+id/dialog_new_day_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="20.0&#176;C"
-        android:textSize="40sp"
         android:inputType="numberDecimal"
-        android:id="@+id/dialog_new_day_temp"/>
+        android:text="20.0&#176;C"
+        android:textSize="30sp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:text="Night Temperature"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="30sp"
+        android:textSize="25sp"
         android:layout_marginTop="16dp"/>
 
     <TextView
@@ -57,7 +57,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="20.0&#176;C"
-        android:textSize="40sp"
+        android:textSize="30sp"
         android:inputType="numberDecimal"
         android:id="@+id/dialog_new_night_temp"/>
 
