@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.graphics.Paint;
+import android.media.audiofx.BassBoost;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -140,8 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 //Set the text for the server day and time on the settings page(only if the settings page is active)
                                 if(isSettingsFragActive) {
-                                    SettingsFragment.serverDay.setHint(currentDay);
-                                    SettingsFragment.serverTime.setHint(currentTime);
                                     SettingsFragment.settingsServerDay.setText(currentDay);
                                     SettingsFragment.settingsServerTime.setText(currentTime);
                                 }

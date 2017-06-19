@@ -10,13 +10,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.thermostatapp.util.HeatingSystem;
+
+import java.util.ArrayList;
 
 /**
  * Created by Claudiu Ion on 09/06/2017.
@@ -26,8 +30,12 @@ public class SettingsFragment extends Fragment {
 
     public static TextView serverDay, serverTime;
     public static TextView settingsServerDay, settingsServerTime;
+    public static Spinner daySpinner;
+    public String currentDay;
     //Array for storing the days of the week
-    public static String[] weekDays = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
+    public static String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+    //Array List for the spinner
+    ArrayList<String> spinnerArray =  new ArrayList<String>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,72 +47,69 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         final View view =  inflater.inflate(R.layout.settings_fragment, container, false);
 
-        serverDay = (TextView) view.findViewById(R.id.settings_day);
+        daySpinner = (Spinner) view.findViewById(R.id.settings_spinner);
         serverTime = (TextView) view.findViewById(R.id.settings_time);
         settingsServerDay = (TextView) view.findViewById(R.id.settings_server_day);
         settingsServerTime = (TextView) view.findViewById(R.id.settings_server_time);
 
-        serverDay.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
         serverTime.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
 
-        serverDay.setOnClickListener(new View.OnClickListener() {
+        //Configure the spinner to display the week days
+        for(int i = 0; i < weekDays.length; i++) {
+            spinnerArray.add(weekDays[i]);
+        }
+        //Configure the adapter for the spinner
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        daySpinner.setAdapter(spinnerAdapter);
+
+        Thread setupDay = new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                final Dialog tempDialog = new Dialog(getContext());
-
-                tempDialog.setContentView(R.layout.day_change_dialog);
-
-                Button okButton = (Button) tempDialog.findViewById(R.id.server_ok_button);
-                Button cancelButton = (Button) tempDialog.findViewById(R.id.server_cancel_button);
-                final EditText newWeekDay = (EditText) tempDialog.findViewById(R.id.new_week_day);
-
-                okButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //Check if the newTemp field is not empty
-                        if(newWeekDay.getText().toString().length() > 0) {
-                            final String newTempString = String.valueOf(newWeekDay.getText());
-
-                            final String weekDay = newTempString.toLowerCase();
-                            Boolean validInput = false;
-
-                            for(int i = 0; i < 7; i++) {
-                                if(weekDays[i].equals(weekDay)) {
-                                    validInput = true;
-                                }
-                            }
-
-                            if(validInput) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            HeatingSystem.put("day", weekDay);
-                                        } catch(Exception e) {
-                                            System.err.println("Error occurred " + e);
-                                        }
-                                    }
-                                }).start();
-
-                                //Close the temperature dialog
-                                tempDialog.dismiss();
-                            } else {
-                                Toast.makeText(getContext(), "Please enter a valid week day", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }
-                });
-
-                cancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        tempDialog.dismiss();
-                    }
-                });
-
-                tempDialog.show();
+            public void run() {
+                try {
+                    currentDay = HeatingSystem.get("day");
+                } catch (Exception e) {
+                    System.err.println("Error occurred " + e);
+                }
             }
         });
+
+        setupDay.start();
+
+        try {
+            setupDay.join();
+            int position = 0;
+            for(int i = 0; i < 7; i++) {
+                if(weekDays[i].equals(currentDay)) {
+                    position = i;
+                }
+            }
+            daySpinner.setSelection(position);
+        } catch (Exception e) {
+            System.err.println("Error occurred " + e);
+        }
+
+        daySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                final String daySelected = daySpinner.getSelectedItem().toString();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            HeatingSystem.put("day", daySelected);
+                        } catch (Exception e) {
+                            System.err.println("Error occurred " + e);
+                        }
+                    }
+                }).start();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
 
         serverTime.setOnClickListener(new View.OnClickListener() {
             @Override
