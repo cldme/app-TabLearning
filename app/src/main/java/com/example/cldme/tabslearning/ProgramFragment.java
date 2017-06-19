@@ -43,7 +43,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     //Variable for keeping track of the current day
     public static int currentDayIndex = 0;
     //Hours array for checking duplicate hours
-    private int[] hoursArray = new int[24];
+    private int[][] hoursArray = new int[24][60];
     //Minutes array for checking duplicate minutes
     private int[] minutesArray = new int[60];
     //Arrays for storing the configuration of the switches
@@ -247,10 +247,9 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                             //Prompt user with message that the week program is now reset
                             Toast.makeText(getContext(), "The program was reset to default", Toast.LENGTH_SHORT).show();
                             //Reset the hours and minutes array to be used for duplicate checking again
-                            for(int i = 0; i < hoursArray.length; i++)
-                                hoursArray[i] = 0;
-                            for(int i = 0; i < minutesArray.length; i++)
-                                minutesArray[i] = 0;
+                            for(int i = 0; i < 24; i++)
+                                for(int j = 0; j < 60; j++)
+                                    hoursArray[i][j] = 0;
                         } catch (Exception e) {
                             System.err.println("Error occurred " + e);
                         }
@@ -301,10 +300,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 int hour = timePicker.getHour();
                 int minute = timePicker.getMinute();
 
-                if(hoursArray[hour] == 1 && minutesArray[minute] == 1) {
+                if(hoursArray[hour][minute] == 1) {
                     Toast.makeText(getContext(), "There is already a switch for this time combination", Toast.LENGTH_SHORT).show();
                 } else {
-                    hoursArray[hour] = minutesArray[minute] = 1;
+                    hoursArray[hour][minute] = 1;
                     updateTextView(hour, minute, viewMain);
                     timerDialog.dismiss();
                 }
@@ -337,8 +336,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         int hours = Integer.parseInt(hoursString);
         int minutes = Integer.parseInt(minutesString);
 
-        hoursArray[hours] = 0;
-        minutesArray[minutes] = 0;
+        hoursArray[hours][minutes] = 0;
     }
 
     //Update the switch arrays (type/state/time arrays)
@@ -511,11 +509,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             getWeekThread.join();
 
             //Reset the arrays which are checking for doubles
-            for(int i = 0; i < hoursArray.length; i++) {
-                hoursArray[i] = 0;
-            }
-            for(int i = 0; i < minutesArray.length; i++) {
-                minutesArray[i] = 0;
+            for(int i = 0; i < 24; i++) {
+                for(int j = 0; j < 60; j++) {
+                    hoursArray[i][j] = 0;
+                }
             }
 
             //Configure the UI layout to properly display the week program retrieved from the server
@@ -542,7 +539,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 int minutes = Integer.parseInt(minutesString);
 
                 if(hours != 0 || minutes != 0)
-                    hoursArray[hours] = minutesArray[minutes] = 1;
+                    hoursArray[hours][minutes] = 1;
 
                 if(type.equals("day")) {
                     timesView[dayIndex].setText(time);

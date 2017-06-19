@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     //Flag for marking if the program fragment is active
     Boolean isProgramFragActive;
 
+    //Flag for marking if the settings fragment is active
+    Boolean isSettingsFragActive;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -49,22 +53,27 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     //Function for checking if the changes that were made in the week program had been sent to the server
-                    checkWeekProgramStatus();
+                    if(isProgramFragActive)
+                        checkWeekProgramStatus();
                     customFragment = HomeFragment.newInstance();
                     //Mark the program fragment as being inactive
                     isProgramFragActive = false;
+                    isSettingsFragActive = false;
                     break;
                 case R.id.navigation_program:
                     customFragment = ProgramFragment.newInstance();
                     //Mark the program fragment as being active
                     isProgramFragActive = true;
+                    isSettingsFragActive = false;
                     break;
-                case R.id.navigation_notifications:
+                case R.id.navigation_settings:
                     //Function for checking if the changes that were made in the week program had been sent to the server
-                    checkWeekProgramStatus();
-                    customFragment = NotificationsFragment.newInstance();
+                    if(isProgramFragActive)
+                        checkWeekProgramStatus();
+                    customFragment = SettingsFragment.newInstance();
                     //Mark the program fragment as being inactive
                     isProgramFragActive = false;
+                    isSettingsFragActive = true;
                     break;
             }
             displayLayout(customFragment);
@@ -93,6 +102,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Set the flag for the program fragment to false (since the app opens on the home fragment)
         isProgramFragActive = false;
+
+        //Set the flag for the settings fragment to false (since the app opens on the home fragment)
+        isSettingsFragActive = false;
 
         new Thread() {
 
@@ -124,6 +136,14 @@ public class MainActivity extends AppCompatActivity {
                                 if(isProgramFragActive) {
                                     ProgramFragment.progServerDay.setText(currentDay);
                                     ProgramFragment.progServerTime.setText(currentTime);
+                                }
+
+                                //Set the text for the server day and time on the settings page(only if the settings page is active)
+                                if(isSettingsFragActive) {
+                                    SettingsFragment.serverDay.setHint(currentDay);
+                                    SettingsFragment.serverTime.setHint(currentTime);
+                                    SettingsFragment.settingsServerDay.setText(currentDay);
+                                    SettingsFragment.settingsServerTime.setText(currentTime);
                                 }
 
                                 HomeFragment.currentTemp.setText(String.valueOf(currentTemperature) + " \u2103");

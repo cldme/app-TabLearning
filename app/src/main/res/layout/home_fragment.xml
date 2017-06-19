@@ -197,8 +197,8 @@
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center|bottom">
+                        android:gravity="center|bottom"
+                        android:orientation="vertical">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -215,7 +215,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/day_temp_string"
-                                android:textSize="17sp"/>
+                                android:textSize="17sp" />
 
                         </LinearLayout>
 
@@ -234,18 +234,18 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/night_temp_string"
-                                android:textSize="17sp"/>
+                                android:textSize="17sp" />
 
                         </LinearLayout>
 
                     </LinearLayout>
 
                     <Button
+                        android:id="@+id/change_temperature"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Change"
                         android:layout_marginLeft="16dp"
-                        android:id="@+id/change_temperature"/>
+                        android:text="Change" />
 
                 </LinearLayout>
 
