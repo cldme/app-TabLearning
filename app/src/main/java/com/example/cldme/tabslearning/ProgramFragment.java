@@ -524,6 +524,8 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             int dayIndex = 9, nightIndex = 4;
             String hoursString, minutesString;
             int pos = 0;
+            Boolean doneDayEmptySwitches = false;
+            Boolean doneNightEmptySwitches = false;
 
             for(int i = 0; i < switchArrayList.size(); i++) {
                 String type = switchArrayList.get(i).type;
@@ -543,19 +545,35 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 int hours = Integer.parseInt(hoursString);
                 int minutes = Integer.parseInt(minutesString);
 
-                if(hours != 0 || minutes != 0)
+                if(hours != 0 || minutes != 0) {
                     hoursArray[hours][minutes] = 1;
+                    if(type.equals("day") && doneDayEmptySwitches == false) {
+                        doneDayEmptySwitches = true;
+                        dayIndex = 5;
+                    } else if(type.equals("night") && doneNightEmptySwitches == false){
+                        doneNightEmptySwitches = true;
+                        nightIndex = 0;
+                    }
+                }
 
                 if(type.equals("day")) {
                     timesView[dayIndex].setText(time);
                     updateSwitches(dayIndex, type, state, time);
                     //Log.d("custom", daySwitch[dayIndex] + " " + stateSwitch[dayIndex] + " " + timeSwitch[dayIndex]);
-                    dayIndex -= 1;
+                    if(doneDayEmptySwitches) {
+                        dayIndex += 1;
+                    } else {
+                        dayIndex -= 1;
+                    }
                 } else {
                     timesView[nightIndex].setText(time);
                     updateSwitches(nightIndex, type, state, time);
                     //Log.d("custom", daySwitch[nightIndex] + " " + stateSwitch[nightIndex] + " " + timeSwitch[nightIndex]);
-                    nightIndex -= 1;
+                    if(doneNightEmptySwitches) {
+                        nightIndex += 1;
+                    } else {
+                        nightIndex -= 1;
+                    }
                 }
             }
 
