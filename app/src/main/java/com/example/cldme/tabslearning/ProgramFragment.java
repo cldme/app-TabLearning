@@ -209,7 +209,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onClick(View v) {
 
-                vibe.vibrate(700);
+                vibe.vibrate(500);
 
                 final AlertDialog.Builder theDialog = new AlertDialog.Builder(getActivity());
 
@@ -217,7 +217,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 theDialog.setTitle("Reset Program");
 
                 // Set the message
-                theDialog.setMessage("This will reset the weekly program. All switches will be removed and you will loose all changes. Are you sure ?");
+                theDialog.setMessage("This will reset the weekly program. All switches will be removed and you will lose all changes. Are you sure ?");
 
                 //Add the positive button
                 theDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -355,6 +355,11 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         hasChanged = true;
         //Mark that the changes were not updated on the server
         hasUpdated = false;
+
+        //Convert single digit hours into double digits
+        if(hours < 10) {
+            hoursString = "0" + hoursString;
+        }
 
         //Convert single digit minutes to two digits 7 - 07
         if(minutes < 10) {

@@ -32,9 +32,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public static TextView serverDay, serverTime;
     public static TextView currentTemp, targetTemp;
     public static TextView dayTemp, nightTemp;
+    public TextView dayTempDialog, nightTempDialog;
     public static Switch weekSwitch;
     public static SeekBar seekBar;
     public static Button changeButton;
+    public static SeekBar dayTempBar, nightTempBar;
 
     private Double currentTempVal, targetTempVal;
     private String weekStateString;
@@ -94,6 +96,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     //Get all the information from the server
                     final Double currentTemperature = Double.parseDouble(HeatingSystem.get("currentTemperature"));
                     final Double targetTemperature = Double.parseDouble(HeatingSystem.get("targetTemperature"));
+                    newDayTemp = Double.parseDouble(HeatingSystem.get("dayTemperature"));
+                    newNightTemp = Double.parseDouble(HeatingSystem.get("nightTemperature"));
                     final String dayTempString = HeatingSystem.get("dayTemperature");
                     final String nightTempString = HeatingSystem.get("nightTemperature");
 
@@ -285,21 +289,26 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         //Check if the newTemp field is not empty
                         if(newTemp.getText().toString().length() > 0) {
                             final String newTempString = String.valueOf(newTemp.getText());
+                            final Double newTempDay = Double.parseDouble(newTemp.getText().toString());
 
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        HeatingSystem.put("dayTemperature", newTempString);
-                                    } catch(Exception e) {
-                                        System.err.println("Error occurred " + e);
+                            if(newTempDay >= 5 && newTempDay <= 30) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            HeatingSystem.put("dayTemperature", newTempString);
+                                        } catch(Exception e) {
+                                            System.err.println("Error occurred " + e);
+                                        }
                                     }
-                                }
-                            }).start();
-                        }
+                                }).start();
 
-                        //Close the temperature dialog
-                        tempDialog.dismiss();
+                                //Close the temperature dialog
+                                tempDialog.dismiss();
+                            } else {
+                                Toast.makeText(getContext(), "Please enter a temperature between 5 and 30 degrees Celsius", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
                 });
 
@@ -374,69 +383,91 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 Button okButton = (Button) tempDialog.findViewById(R.id.dialog_temp_ok);
                 Button cancelButton = (Button) tempDialog.findViewById(R.id.dialog_temp_cancel);
-                final TextView dayTemp = (TextView) tempDialog.findViewById(R.id.dialog_new_day_temp);
-                final TextView nightTemp = (TextView) tempDialog.findViewById(R.id.dialog_new_night_temp);
+                dayTempDialog = (TextView) tempDialog.findViewById(R.id.dialog_new_day_temp);
+                nightTempDialog = (TextView) tempDialog.findViewById(R.id.dialog_new_night_temp);
                 ImageButton dayPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_day);
                 ImageButton dayMinus = (ImageButton) tempDialog.findViewById(R.id.dialog_minus_button_day);
                 ImageButton nightPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_night);
                 ImageButton nightMinus = (ImageButton) tempDialog.findViewById(R.id.dialog_minus_button_night);
 
-                Thread getTemp = new Thread(new Runnable() {
+                dayTempBar = (SeekBar) tempDialog.findViewById(R.id.dialog_day_temp_bar);
+                nightTempBar = (SeekBar) tempDialog.findViewById(R.id.dialog_night_temp_bar);
+
+                Thread getTemps = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         try {
-                            String newDayTempString = HeatingSystem.get("dayTemperature");
-                            String newNightTempString = HeatingSystem.get("nightTemperature");
-
-                            newDayTemp = Double.parseDouble(newDayTempString);
-                            newNightTemp = Double.parseDouble(newNightTempString);
+                            newDayTemp = Double.parseDouble(HeatingSystem.get("dayTemperature"));
+                            newNightTemp = Double.parseDouble(HeatingSystem.get("nightTemperature"));
                         } catch (Exception e) {
                             System.err.println("Error occurred " + e);
                         }
                     }
                 });
 
-                getTemp.start();
+                getTemps.start();
 
-                try{
-                    getTemp.join();
+                try {
+                    getTemps.join();
                 } catch (Exception e) {
                     System.err.println("Error occurred " + e);
                 }
 
+                //Set the seek bars for the temperature dialog change
+                dayTempBar.setMax(250);
+                nightTempBar.setMax(250);
+                //Set the seekBar listener
+                dayTempBar.setOnSeekBarChangeListener(seekBarDay);
+                nightTempBar.setOnSeekBarChangeListener(seekBarNight);
+                //Set the progress of the seekBar
+                updateSeekBarDay(newDayTemp);
+                updateSeekBarNight(newNightTemp);
+
                 //Set the day and night temperatures as retrieved from the server
-                dayTemp.setText(newDayTemp + " \u2103");
-                nightTemp.setText(newNightTemp + " \u2103");
+                dayTempDialog.setText(newDayTemp + " \u2103");
+                nightTempDialog.setText(newNightTemp + " \u2103");
 
                 dayPlus.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        newDayTemp = Math.round((newDayTemp + 0.1) * 10.0) / 10.0 ;
-                        dayTemp.setText(newDayTemp + " \u2103");
+                        if(newDayTemp >= 5 && newDayTemp < 30) {
+                            newDayTemp = Math.round((newDayTemp + 0.1) * 10.0) / 10.0 ;
+                            dayTempDialog.setText(newDayTemp + " \u2103");
+                            updateSeekBarDay(newDayTemp);
+                        }
                     }
                 });
 
                 dayMinus.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        newDayTemp = Math.round((newDayTemp - 0.1) * 10.0) / 10.0;
-                        dayTemp.setText(newDayTemp + " \u2103");
+                        if(newDayTemp > 5 && newDayTemp <= 30) {
+                            newDayTemp = Math.round((newDayTemp - 0.1) * 10.0) / 10.0;
+                            dayTempDialog.setText(newDayTemp + " \u2103");
+                            updateSeekBarDay(newDayTemp);
+                        }
                     }
                 });
 
                 nightPlus.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        newNightTemp = Math.round((newNightTemp + 0.1) * 10.0) / 10.0 ;
-                        nightTemp.setText(newNightTemp + " \u2103");
+                        if(newNightTemp >= 5 && newNightTemp < 30) {
+                            newNightTemp = Math.round((newNightTemp + 0.1) * 10.0) / 10.0 ;
+                            nightTempDialog.setText(newNightTemp + " \u2103");
+                            updateSeekBarNight(newNightTemp);
+                        }
                     }
                 });
 
                 nightMinus.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        newNightTemp = Math.round((newNightTemp - 0.1) * 10.0) / 10.0;
-                        nightTemp.setText(newNightTemp + " \u2103");
+                        if(newNightTemp > 5 && newNightTemp <=30) {
+                            newNightTemp = Math.round((newNightTemp - 0.1) * 10.0) / 10.0;
+                            nightTempDialog.setText(newNightTemp + " \u2103");
+                            updateSeekBarNight(newNightTemp);
+                        }
                     }
                 });
 
@@ -446,9 +477,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                         final String newDayTempString = String.valueOf(newDayTemp);
                         final String newNightTempString = String.valueOf(newNightTemp);
-
-                        Log.d("custom", "newDayTemp: " + newDayTempString);
-                        Log.d("custom", "newNightTemp: " + newNightTempString);
 
                         Thread tempSetup = new Thread(new Runnable() {
                             @Override
@@ -487,4 +515,74 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             }
     };
 
+    //SeekBar listener for the daySeekBar
+    public SeekBar.OnSeekBarChangeListener seekBarDay =
+            new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    //Calculate the temperature from the seekBar then update the temperature text
+                    double temp = (double)(tempMin + Math.round(progress) / 10.0);
+                    //Update the targetTemp variable (!important)
+                    newDayTemp = temp;
+                    setDayNightTemp(newDayTemp, newNightTemp);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            };
+
+    //SeekBar listener for the nightSeekBar
+    public SeekBar.OnSeekBarChangeListener seekBarNight =
+            new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    //Calculate the temperature from the seekBar then update the temperature text
+                    double temp = (double)(tempMin + Math.round(progress) / 10.0);
+                    //Update the targetTemp variable (!important)
+                    newNightTemp = temp;
+                    setDayNightTemp(newDayTemp, newNightTemp);
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            };
+
+
+    //Call this function each time the plus/minus buttons are pressed (from the change temp dialog)
+    public void updateSeekBarDay(double temp) {
+        dayTempBar.setProgress((int)((temp / 0.1) - tempMin * 10));
+    }
+
+    //Call this function each time the plus/minus buttons are pressed (from the change temp dialog)
+    public void updateSeekBarNight(double temp) {
+        nightTempBar.setProgress((int)((temp / 0.1) - tempMin * 10));
+    }
+
+    //Function for updating the day or night temperatures
+    //Update the target temperature both on the server and in the fragment view
+    private void setDayNightTemp(final double dayTemp, final double nightTemp) {
+
+        Double customDayTemp = dayTemp;
+        customDayTemp = (Math.round(customDayTemp * 100) / 10) / 10.0;
+
+        Double customNightTemp = nightTemp;
+        customNightTemp = (Math.round(customNightTemp * 100) / 10) / 10.0;
+
+        dayTempDialog.setText(customDayTemp + " \u2103");
+        nightTempDialog.setText(customNightTemp + " \u2103");
+    }
 }

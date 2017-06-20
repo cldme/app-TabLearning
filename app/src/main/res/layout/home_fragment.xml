@@ -157,7 +157,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="16dp"
+            android:layout_margin="5dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -192,6 +192,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="100dp"
                     android:orientation="horizontal">
 
                     <LinearLayout
@@ -204,37 +205,51 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content">
 
+                            <ImageView
+                                android:id="@+id/imageView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:src="@drawable/ic_day" />
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Day Temperature "
-                                android:textSize="20sp" />
+                                android:textSize="18sp" />
 
                             <TextView
                                 android:id="@+id/day_temperature"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/day_temp_string"
-                                android:textSize="17sp" />
+                                android:textSize="15sp" />
 
                         </LinearLayout>
 
                         <LinearLayout
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="10dp"
+                                android:src="@drawable/ic_night" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Night Temperature "
-                                android:textSize="20sp" />
+                                android:textSize="18sp" />
 
                             <TextView
                                 android:id="@+id/night_temperature"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:hint="@string/night_temp_string"
-                                android:textSize="17sp" />
+                                android:textSize="15sp" />
 
                         </LinearLayout>
 
@@ -244,8 +259,9 @@
                         android:id="@+id/change_temperature"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:text="Edit" />
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="5dp"
+                        android:text="Edit"/>
 
                 </LinearLayout>
 

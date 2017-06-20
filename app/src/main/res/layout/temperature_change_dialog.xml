@@ -1,31 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center|top"
     android:layout_margin="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Day Temperature"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="25sp"/>
+        android:orientation="horizontal"
+        android:id="@+id/day_temp_layout"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_day"
+            android:layout_marginTop="5dp"/>
+
+        <TextView
+            android:id="@+id/dialog_temp_day_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day Temperature"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="25sp"
+            android:gravity="center"/>
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/dialog_new_day_temp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
+        android:layout_below="@+id/day_temp_layout"
         android:inputType="numberDecimal"
         android:text="20.0&#176;C"
-        android:textSize="30sp" />
+        android:textSize="30sp"
+        android:gravity="center"/>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/dialog_day_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp">
+        android:layout_below="@+id/dialog_new_day_temp"
+        android:layout_alignParentStart="true">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -33,38 +54,72 @@
             android:src="@drawable/ic_remove"
             android:background="?android:selectableItemBackground"
             android:id="@+id/dialog_minus_button_day"
-            android:layout_marginRight="100dp"/>
+            android:layout_alignParentLeft="true"/>
+
+        <SeekBar
+            android:id="@+id/dialog_day_temp_bar"
+            style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/dialog_plus_button_day"
+            android:layout_toRightOf="@+id/dialog_minus_button_day"
+            android:max="30" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add"
             android:background="?android:selectableItemBackground"
-            android:id="@+id/dialog_plus_button_day"/>
+            android:id="@+id/dialog_plus_button_day"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/night_temp_layout"
+        android:layout_below="@+id/dialog_day_layout"
+        android:layout_marginTop="16dp">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_night"
+            android:layout_marginTop="5dp"/>
+
+        <TextView
+            android:id="@+id/dialog_night_temp_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Night Temperature"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textSize="25sp"
+            android:gravity="center"/>
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Night Temperature"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="25sp"
-        android:layout_marginTop="16dp"/>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:text="20.0&#176;C"
         android:textSize="30sp"
         android:inputType="numberDecimal"
-        android:id="@+id/dialog_new_night_temp"/>
+        android:id="@+id/dialog_new_night_temp"
+        android:layout_below="@+id/night_temp_layout"
+        android:gravity="center"/>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/dialog_night_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/dialog_new_night_temp"
+        android:gravity="center">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -72,22 +127,36 @@
             android:src="@drawable/ic_remove"
             android:background="?android:selectableItemBackground"
             android:id="@+id/dialog_minus_button_night"
-            android:layout_marginRight="100dp"/>
+            android:layout_alignParentLeft="true"/>
+
+        <SeekBar
+            android:id="@+id/dialog_night_temp_bar"
+            style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/dialog_plus_button_night"
+            android:layout_toRightOf="@+id/dialog_minus_button_night"
+            android:max="30" />
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_add"
             android:background="?android:selectableItemBackground"
-            android:id="@+id/dialog_plus_button_night"/>
+            android:id="@+id/dialog_plus_button_night"
+            android:layout_alignParentRight="true"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="5dp">
+        android:layout_marginTop="5dp"
+        android:layout_below="@id/dialog_night_layout"
+        android:gravity="center"
+        android:id="@+id/linearLayout">
 
         <Button
             android:layout_width="wrap_content"
@@ -103,4 +172,4 @@
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

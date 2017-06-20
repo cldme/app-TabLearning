@@ -31,7 +31,7 @@ public class SettingsFragment extends Fragment {
     public static TextView serverDay, serverTime;
     public static TextView settingsServerDay, settingsServerTime;
     public static Spinner daySpinner;
-    public String currentDay;
+    public String currentDay, currentTime;
     //Array for storing the days of the week
     public static String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     //Array List for the spinner
@@ -68,6 +68,7 @@ public class SettingsFragment extends Fragment {
             public void run() {
                 try {
                     currentDay = HeatingSystem.get("day");
+                    currentTime = HeatingSystem.get("time");
                 } catch (Exception e) {
                     System.err.println("Error occurred " + e);
                 }
@@ -85,6 +86,7 @@ public class SettingsFragment extends Fragment {
                 }
             }
             daySpinner.setSelection(position);
+            serverTime.setHint(currentTime);
         } catch (Exception e) {
             System.err.println("Error occurred " + e);
         }
@@ -154,6 +156,7 @@ public class SettingsFragment extends Fragment {
                         }
 
                         final String time = finalHour + ":" + finalMinute;
+                        serverTime.setHint(time);
 
                         new Thread(new Runnable() {
                             @Override
