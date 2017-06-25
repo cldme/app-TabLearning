@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -381,8 +382,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 tempDialog.setContentView(R.layout.temperature_change_dialog);
 
-                Button okButton = (Button) tempDialog.findViewById(R.id.dialog_temp_ok);
-                Button cancelButton = (Button) tempDialog.findViewById(R.id.dialog_temp_cancel);
+                TextView okButton = (TextView) tempDialog.findViewById(R.id.dialog_temp_ok);
+                TextView cancelButton = (TextView) tempDialog.findViewById(R.id.dialog_temp_cancel);
                 dayTempDialog = (TextView) tempDialog.findViewById(R.id.dialog_new_day_temp);
                 nightTempDialog = (TextView) tempDialog.findViewById(R.id.dialog_new_night_temp);
                 ImageButton dayPlus = (ImageButton) tempDialog.findViewById(R.id.dialog_plus_button_day);

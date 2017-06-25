@@ -1,8 +1,10 @@
 package com.example.cldme.tabslearning;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,6 +34,11 @@ public class SettingsFragment extends Fragment {
     public static TextView settingsServerDay, settingsServerTime;
     public static Spinner daySpinner;
     public String currentDay, currentTime;
+
+    //Declare variables for the time picker
+    private AlertDialog.Builder builder;
+    private TimePicker timer;
+
     //Array for storing the days of the week
     public static String[] weekDays = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     //Array List for the spinner
@@ -116,75 +123,66 @@ public class SettingsFragment extends Fragment {
         serverTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Generate the timerPicker dialog
-                final Dialog timerDialog = new Dialog(getContext());
 
-                timerDialog.setContentView(R.layout.timer_dialog);
+                // custom dialog
+                builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Time Picker");
 
-                timerDialog.setTitle("Time Picker");
-
-                final TimePicker timePicker = (TimePicker) timerDialog.findViewById(R.id.timer);
-                Button okButton = (Button) timerDialog.findViewById(R.id.ok_button);
-                Button cancelButton = (Button) timerDialog.findViewById(R.id.cancel_button);
-
-                timePicker.setIs24HourView(true);
-
-                timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-                    @Override
-                    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-                    }
-                });
-
-                okButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //Check for duplicate times before dismissing the timer dialog
-                        int hour = timePicker.getHour();
-                        int minute = timePicker.getMinute();
-                        String finalHour, finalMinute;
-
-                        if(hour < 10) {
-                            finalHour = "0" + hour;
-                        } else {
-                            finalHour = String.valueOf(hour);
-                        }
-
-                        if(minute < 10) {
-                            finalMinute = "0" + minute;
-                        } else {
-                            finalMinute = String.valueOf(minute);
-                        }
-
-                        final String time = finalHour + ":" + finalMinute;
-                        serverTime.setHint(time);
-
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    HeatingSystem.put("time", time);
-                                } catch (Exception e) {
-                                    System.err.println("Error occurred " + e);
-                                }
+                // set dialog message
+                builder
+                        .setMessage("Select the time for the new switch")
+                        .setView(R.layout.timer_dialog)
+                        .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // if this button is clicked, close
+                                // current activity
+                                updateTime();
+                                dialog.dismiss();
                             }
-                        }).start();
+                        })
+                        .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // if this button is clicked, just close
+                                // the dialog box and do nothing
+                                dialog.dismiss();
+                            }
+                        });
 
-                        timerDialog.dismiss();
-                    }
-                });
-
-                cancelButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        timerDialog.dismiss();
-                    }
-                });
-
-                timerDialog.show();
+                //Get the time picker from the dialog
+                timer = (TimePicker) builder.show().findViewById(R.id.timer);
             }
         });
 
         return view;
+    }
+
+    public void updateTime() {
+        String hours = String.valueOf(timer.getHour());
+        String minutes = String.valueOf(timer.getMinute());
+
+        //Format the time to the appropriate time format for the server
+        if(timer.getHour() < 10) {
+            hours = "0" + hours;
+        }
+
+        if(timer.getMinute() < 10) {
+            minutes = "0" + minutes;
+        }
+
+        final String time = hours + ":" + minutes;
+
+        serverTime.setHint(time);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    HeatingSystem.put("time", time);
+                } catch (Exception e) {
+                    System.err.println("Error occurred " + e);
+                }
+            }
+        }).start();
     }
 
     public static SettingsFragment newInstance() {

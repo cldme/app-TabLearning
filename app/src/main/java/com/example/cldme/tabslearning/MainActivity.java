@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                         //Wait some time until new information is generated on the server
-                        Thread.sleep(100);
+                        Thread.sleep(1000);
                     }
                 } catch(Exception e) {
                     System.err.println("Error occured " + e);

@@ -34,6 +34,10 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     public static ImageButton progLeft, progRight;
     public static TextView weekDay;
 
+    //Declare variables for the time picker
+    private AlertDialog.Builder builder;
+    private TimePicker timer;
+
     //Declare an array for the text views that are in the layout
     private TextView[] timesView = new TextView[10];
     //Declare an array for the close images that are in the layout
@@ -272,52 +276,47 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onClick(final View viewMain) {
+    public void onClick(final View view) {
 
-        //Generate the timerPicker dialog
-        final Dialog timerDialog = new Dialog(viewContext);
+        // custom dialog
+        builder = new AlertDialog.Builder(viewContext);
+        builder.setTitle("Time Picker");
 
-        timerDialog.setContentView(R.layout.timer_dialog);
+        // set dialog message
+        builder
+                .setMessage("Select the time for the new switch")
+                .setView(R.layout.timer_dialog)
+                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        updateTime(view);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, just close
+                        // the dialog box and do nothing
+                        dialog.dismiss();
+                    }
+                });
 
-        timerDialog.setTitle("Time Picker");
+        //Get the time picker from the dialog
+        timer = (TimePicker) builder.show().findViewById(R.id.timer);
+    }
 
-        final TimePicker timePicker = (TimePicker) timerDialog.findViewById(R.id.timer);
-        Button okButton = (Button) timerDialog.findViewById(R.id.ok_button);
-        Button cancelButton = (Button) timerDialog.findViewById(R.id.cancel_button);
+    public void updateTime(View view) {
 
-        timePicker.setIs24HourView(true);
+        int hour = timer.getHour();
+        int minute = timer.getMinute();
 
-        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-            }
-        });
-
-        okButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Check for duplicate times before dismissing the timer dialog
-                int hour = timePicker.getHour();
-                int minute = timePicker.getMinute();
-
-                if(hoursArray[hour][minute] == 1) {
-                    Toast.makeText(getContext(), "There is already a switch for this time combination", Toast.LENGTH_SHORT).show();
-                } else {
-                    hoursArray[hour][minute] = 1;
-                    updateTextView(hour, minute, viewMain);
-                    timerDialog.dismiss();
-                }
-            }
-        });
-
-        cancelButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                timerDialog.dismiss();
-            }
-        });
-
-        timerDialog.show();
+        if(hoursArray[hour][minute] == 1) {
+            Toast.makeText(getContext(), "There is already a switch for this time combination", Toast.LENGTH_SHORT).show();
+        } else {
+            hoursArray[hour][minute] = 1;
+            updateTextView(hour, minute, view);
+        }
     }
 
     //Update the arrays which are used for determining duplicates when removing a switch
@@ -344,6 +343,7 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
         daySwitch[pos] = type;
         stateSwitch[pos] = state;
         timeSwitch[pos] = time;
+        timesView[pos].setText(time);
     }
 
     //Update the text views with the new time
@@ -371,43 +371,33 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
 
         switch(view.getId()) {
             case R.id.night_time1:
-                timesView[0].setText(time);
                 updateSwitches(0, "night", true, time);
                 break;
             case R.id.night_time2:
-                timesView[1].setText(time);
                 updateSwitches(1, "night", true, time);
                 break;
             case R.id.night_time3:
-                timesView[2].setText(time);
                 updateSwitches(2, "night", true, time);
                 break;
             case R.id.night_time4:
-                timesView[3].setText(time);
                 updateSwitches(3, "night", true, time);
                 break;
             case R.id.night_time5:
-                timesView[4].setText(time);
                 updateSwitches(4, "night", true, time);
                 break;
             case R.id.day_time1:
-                timesView[5].setText(time);
                 updateSwitches(5, "day", true, time);
                 break;
             case R.id.day_time2:
-                timesView[6].setText(time);
                 updateSwitches(6, "day", true, time);
                 break;
             case R.id.day_time3:
-                timesView[7].setText(time);
                 updateSwitches(7, "day", true, time);
                 break;
             case R.id.day_time4:
-                timesView[8].setText(time);
                 updateSwitches(8, "day", true, time);
                 break;
             case R.id.day_time5:
-                timesView[9].setText(time);
                 updateSwitches(9, "day", true, time);
                 break;
         }
@@ -429,52 +419,42 @@ public class ProgramFragment extends Fragment implements View.OnClickListener {
                 switch (view.getId()) {
                     case R.id.night_close1:
                         updateDuplicatesArray(timesView[0].getText().toString());
-                        timesView[0].setText(time);
                         updateSwitches(0, "night", false, time);
                         break;
                     case R.id.night_close2:
                         updateDuplicatesArray(timesView[1].getText().toString());
-                        timesView[1].setText(time);
                         updateSwitches(1, "night", false, time);
                         break;
                     case R.id.night_close3:
                         updateDuplicatesArray(timesView[2].getText().toString());
-                        timesView[2].setText(time);
                         updateSwitches(2, "night", false, time);
                         break;
                     case R.id.night_close4:
                         updateDuplicatesArray(timesView[3].getText().toString());
-                        timesView[3].setText(time);
                         updateSwitches(3, "night", false, time);
                         break;
                     case R.id.night_close5:
                         updateDuplicatesArray(timesView[4].getText().toString());
-                        timesView[4].setText(time);
                         updateSwitches(4, "night", false, time);
                         break;
                     case R.id.day_close1:
                         updateDuplicatesArray(timesView[5].getText().toString());
-                        timesView[5].setText(time);
                         updateSwitches(5, "day", false, time);
                         break;
                     case R.id.day_close2:
                         updateDuplicatesArray(timesView[6].getText().toString());
-                        timesView[6].setText(time);
                         updateSwitches(6, "day", false, time);
                         break;
                     case R.id.day_close3:
                         updateDuplicatesArray(timesView[7].getText().toString());
-                        timesView[7].setText(time);
                         updateSwitches(7, "day", false, time);
                         break;
                     case R.id.day_close4:
                         updateDuplicatesArray(timesView[8].getText().toString());
-                        timesView[8].setText(time);
                         updateSwitches(8, "day", false, time);
                         break;
                     case R.id.day_close5:
                         updateDuplicatesArray(timesView[9].getText().toString());
-                        timesView[9].setText(time);
                         updateSwitches(9, "day", false, time);
                         break;
                 }
